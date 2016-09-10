@@ -6,7 +6,7 @@ layout: default
   <div class="index-wrapper">
     <div class="aside">
       <div class="info-card">
-        <h1>keep your feet on the ground,head above the cloud</h1>
+        <h1>stay hungry,stay foolish</h1>
       </div>
       <div id="particles-js"></div>
     </div>
