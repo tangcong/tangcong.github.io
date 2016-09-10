@@ -1,2 +1,2 @@
 # tangcong.github.com
-blog
+this is my blog
