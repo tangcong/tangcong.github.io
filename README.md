@@ -1,6 +1,8 @@
+# [My Personal Blog](https://tangcong.github.io/)
 
-thanks beiyuu
+- 感谢 [BeiYuu](https://github.com/beiyuu) 和 [moonsea](https://github.com/moonsea),[FongRay](https://github.com/FongRay)
 
-https://github.com/beiyuu/Github-Pages-Example.git
+- 使用Jekyll和Dispus
 
-https://github.com/FongRay/FongRay.github.io.git
+> License: MIT
+

@@ -1,6 +1,12 @@
+auto: true
+
+markdown: kramdown
+kramdown:
+    input: GFM
+rouge: true
 permalink: /:title
 
-title: tangcong.github.io
+title: Stay Hungry,Stay Foolish 
 url: https://tangcong.github.io
 feed: /atom.xml
-author_info: <a href="https://tangcong.github.io/">tangcong</a>
+author_info: <a href="https://tangcong.github.io">Tang Cong</a>

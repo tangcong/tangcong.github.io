@@ -1,25 +1,27 @@
 ---
-layout: default
+layout: home
 ---
 
-<body>
-  <div class="index-wrapper">
-    <div class="aside">
-      <div class="info-card">
-        <h1>stay hungry,stay foolish</h1>
-      </div>
-      <div id="particles-js"></div>
-    </div>
+<div class="index-content coding">
+  <div class="section">
 
-    <div class="index-content">
-      <ul class="artical-list">
-        {% for post in site.categories.blog %}
-        <li>
-          <a href="{{ post.url }}" class="title">{{ post.title }}</a>
-          <div class="title-desc">{{ post.description }}</div>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
+    <ul class="artical-list">
+      {% for post in site.categories.coding %}
+      <li>
+        <div class="table-article">
+          <div class="col-title">
+            <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+          </div>
+          <div class="col-date">
+            <p class="entry-date">{{ post.date|date:"%Y-%m-%d" }}</p>
+          </div>
+        </div>
+        <div class="title-desc">{{ post.description }}</div>
+      </li>
+      {% endfor %}
+    </ul>
   </div>
-</body>
+  <div class="aside">
+  </div>
+
+</div>
