@@ -12,5 +12,5 @@ category: coding
  
  如何避免各业务资源抢占，相互影响？
 
- [原文](http://mp.weixin.qq.com/s?src=3&timestamp=1473566199&ver=1&signature=dXYw0PnB1JLbfzD-bpzz2vkQLXI4LVvnxUVNxs2z1KZ9nyLWzBJDLLvdFdvLfXMqo7mzj0QIrv62JAr4qV8rpnmspkMwZhYblMKgiHrw8VaB1xVatxWl9i0OkD6Cq4*8m-ofnJl-PPYnUCIu51u3rplavbqQCp9V-bPVyDNxUNM=)发表在微信公众号小时光茶社，欢迎阅读~
+ [原文](http://mp.weixin.qq.com/s?__biz=MzI3NTM1MjExMg==&mid=2247483816&idx=1&sn=136d3da5f2a7cf546440fa8279cbaa47&scene=1&srcid=0823pmID5jdOnO0qQSz1g1ez#rd)发表在微信公众号小时光茶社，欢迎阅读~
   
