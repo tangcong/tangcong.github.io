@@ -8,9 +8,10 @@
 
 
 
-- 感谢[BeiYuu](https://github.com/beiyuu) 和 [moonsea](https://github.com/moonsea),[FongRay](https://github.com/FongRay)
 
-- 使用Jekyll和Dispus
 
-> License: MIT
+感谢[BeiYuu](https://github.com/beiyuu) 和 [moonsea](https://github.com/moonsea),[FongRay](https://github.com/FongRay)
+
+使用github pages,Jekyll和Dispus
+
 
