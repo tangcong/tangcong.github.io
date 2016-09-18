@@ -44,8 +44,9 @@ category: coding
 	const int ZOO_CONNECTED_STATE = CONNECTED_STATE_DEF;
 
 对于无效的状态如（ZOO_EXPIRED_SESSION_STATE）都有close zhandle句柄，重新初始化,但是线上竟然还有无法重连的问题，比较诡异。
-随后猜测是不是有其他状态漏处理了? 这个可通过出现异常的时候zhandle的状态是什么就可以判断是否有漏处理或者出现了其他非法状态，遗憾的是这c++库在核心关键的函数里面没有打印相关日志（哈哈，日志的重要性,不言而喻)，于是我们增加了日志，并且加强了处理逻辑，对于未知的状态也close zhandle,重建连接，发到线上后，bug重现后，通过日志确认的确是出现了未知的状态值0，从上面zookeeper c api定义的状态可知，0是没有定义的，通过搜索源代码发现了给zhandle state赋值为0的地方，在google也搜索到了相关issue.
-https://issues.apache.org/jira/browse/ZOOKEEPER-2519
+随后猜测是不是有其他状态漏处理了? 这个可通过出现异常的时候zhandle的状态是什么就可以判断是否有漏处理或者出现了其他非法状态，遗憾的是这c++库在核心关键的函数里面没有打印相关日志（哈哈，日志的重要性,不言而喻).
+于是我们增加了日志，并且加强了处理逻辑，对于未知的状态也close zhandle,重建连接，发到线上后，bug重现后，通过日志确认的确是出现了未知的状态值0，从上面zookeeper c api定义的状态可知，0是没有定义的，通过搜索源代码发现了给zhandle state赋值为0的地方，在google也搜索到了相关[issue](https://issues.apache.org/jira/browse/ZOOKEEPER-2519).
+
 
 
 
