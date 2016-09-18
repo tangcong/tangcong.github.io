@@ -25,10 +25,10 @@ stat等信息。
 	zookeeper database模型的调用链路
 	
 	ZKDatabase
-		DataTree
-			ConcurrentHashMap<String, DataNode> nodes = new ConcurrentHashMap<String, DataNode>();
-				DataNode
-					data,acl,stat,children
+	 DataTree
+	  ConcurrentHashMap<String, DataNode> nodes = new ConcurrentHashMap<String, DataNode>();
+	   DataNode
+	    data,acl,stat,children
 	
 	class Stat {
 		long czxid;      // created zxid
