@@ -10,7 +10,36 @@ category: coding
 
 ## zookeeper数据模型
 
+存储系统常见的[数据模型](https://en.wikipedia.org/wiki/Database_model)有关系型表格型(Relational Model)、层次树型(Hierarchical model)、扁平型(Flat model)、网络型(Network Model)、对象型(Object-oriented Model).
+![五种常见存储模型图](/images/myblog/480px-Database_models.jpg]
 
+zookeeper的数据模型是层次型,类似文件系统，但是zookeeper的设计目标定位是简单、高可靠、高吞吐、低延迟的内存型存储系统，因此它的value不像文件系统那样会适合保存大的值，官方建议保存的value大小要小于1M，提供的接口类似nosql存储系统(key是路径)。
+！[zookeeper层次模型](/images/myblog/zknamespace.jpg)
+
+那么zookeeper的层次模型是通过什么数据结构实现的呢? get、set、getchildren的时间复杂度又分别是多少呢?
+通过阅读zookeeper server源码，zookeeper是基于ConcurrentHashMap实现的,path是key,value是DataNode,DataNode保存了value、children、
+stat等信息。
+
+	ZKDatabase
+	-- DataTree
+	---- ConcurrentHashMap<String, DataNode> nodes = new ConcurrentHashMap<String, DataNode>();
+	------ DataNode
+	-------- data,acl,stat,children
+	
+	class Stat {
+		long czxid;      // created zxid
+		long mzxid;      // last modified zxid
+		long ctime;      // created
+		long mtime;      // last modified
+		int version;     // version
+		int cversion;    // child version
+		int aversion;    // acl version
+		long ephemeralOwner; // owner id if ephemeral, 0 otw
+		int dataLength;  //length of the data in the node
+		int numChildren; //number of children of this node
+		long pzxid;      // last modified children
+	}
+	
 ## zookeeper核心概念
 
 
