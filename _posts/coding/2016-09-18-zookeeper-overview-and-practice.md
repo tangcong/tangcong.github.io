@@ -20,7 +20,7 @@ category: coding
 ## zookeeper c api
 
 
-## zookeeper c api trouble shooting
+## zookeeper troubleshooting
 
 ### zookeeper c api无法重连
 
