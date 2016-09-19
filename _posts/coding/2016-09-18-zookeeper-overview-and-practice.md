@@ -27,13 +27,13 @@ zookeeper提供的接口类似nosql系统，常用的接口有get/set/create/get
 
 ### zookeeper设计目标
 
-####简单
+#### 简单
 zookeeper数据模型简单，易懂，类似文件系统的层次树形数据结构,存储数据未做shard分散到多机,而是各单机完整存储整个树形层次空间上所有路径的节点数据，数据全部保存在内存，因此可提供高吞吐量、低延迟的服务,也意味着zookeeper不适合保存大节点数据。
 
-####高可用、高性能读
+#### 高可用、高性能读
 因单机上保存了所有数据，若没有多机之间数据同步复制机制，zookeeper系统可用性将极低，因此zookeeper在设计上一个重要目标是可复制的，各节点通过zookeeper atomic broadcast算法选举leader,同步数据。所有写请求follower节点都需转发给leader,读请求在任意一台follower节点上都可以处理。
 
-####有序
+#### 有序
 zookeeper通过基于tcp连接、写请求由leader处理等机制提供有序保证，基于有序机制，zookeeper可以提供同步原语，实现分布式锁等机制。
 
 ## zookeeper数据模型
