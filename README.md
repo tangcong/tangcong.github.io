@@ -4,7 +4,7 @@
 
 * 2016-09-11 [大规模排行榜系统实践及挑战](https://tangcong.github.io/the-practices-and-challenges-of-large-scale-ranking-system)
 
-* 2016-09-18 [ZooKeeper概要及实践](https://tangcong.github.io/zookeeper-overview-and-practice)
+* 2016-09-18 [深入理解ZooKeeper及实践总结](https://tangcong.github.io/dive-into-zookeeper-and-practice)
 
 
 

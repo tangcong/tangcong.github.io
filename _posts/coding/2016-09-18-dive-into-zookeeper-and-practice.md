@@ -1,20 +1,38 @@
 ---
 layout: post
-title: ZooKeeper概要及实践
+title: 深入理解zookeeper及实践总结
 description: zookeeper架构，zookeeper 数据模型,核心概念(watches,session), get/create/set等核心接口读写流程分析，zookeepr c api 使用及Trouble Shooting,最佳实践经验等
 category: coding
 ---
 
-## zookeeper概要
+## zookeeper概况
+
+### 背景&问题
+
+在生产环境中，为了提高服务可用性、支撑更多的用户量等,各类应用服务都分别部署在不同机器、不同IDC，一般情况下我们都会有以下若干需求:
+
+* 1、分布在各个机器、IDC的应用程序如何能高效读取、修改配置?
+* 2、当配置变更时,各节点应用如何快速发现变化、及时响应处理?
+* 3、如何在应用程序部署的各个节点中，选举一个节点，作为leader,执行协调相关操作? leader挂掉时，其他节点能重新发起leader选举? 如何避免脑裂？ 如何处理网络分区？
+* 4、当某个节点异常挂掉时，如何及时发现？
+
+需求1、2在节点数较少、对性能要求不高的情况下，我们可以通过将配置存储在mysql+定时轮询解决，若对性能要求较高我们就需要结合cache、agent、配置变更notify、mysql等组件实现一套配置系统来解决，如淘宝的[diamond](http://codemacro.com/2014/10/12/diamond/)。
+对于需求3、4，在复杂的分布式环境中，我们会遇到高网络延时、网络波动、磁盘故障、机器宕机、机器半死不活、机房断电、网络分区等一系列问题，同时要避免数据不一致、脑裂，还要追求高吞吐、低延时，最大程度减少因选举leader导致服务不可用时间等，最糟糕的是分布式理论FLP(consensus is impossible with asynchronous systems and even one failure)、CAP（consistency,high Availability,partition-tolerance)告诉我们需要在设计上需要权衡取舍，这些如果让业务应用程序来处理，就具有一定的复杂性。
+
+因此，这些复杂问题非常不适合应用程序自己解决，应用程序需要一个God,一个值得信赖的Oracle，同时God提供的Service应该尽量简单、易理解、高性能、易扩展。
+
+Yahoo的工程师们为了解决应用这些问题，设计实现了zookeeper，为什么叫zookeeper? 因为yahoo内部不少分布式系统命名是动物名字，同时分布式环境中的复杂、混乱跟动物园(zoo)是不是有点类似?而zookeeper就是维持、管理整个动物园的秩序,这就是zookeeper的名称的来历。
 
 [ZooKeeper](https://zookeeper.apache.org/doc/trunk/zookeeperOver.html)是一个分布式管理服务，可为应用提供配置管理、名称服务、状态同步、集群管理等功能，我们的应用场景主要是配置管理、分布式锁。
 
 * 为什么apache给它定义是个分布式协调式服务，而不是存储服务？它的设计目标定位是什么? 
-* 它可以当存储服务来使用吗？ 它的数据模型是怎样的? 相比mysql、rocksdb、各类文件系统等存储服务它有什么优缺点? 
-* zookeeper c api是如何实现的？ 服务端的读写流程又是怎样的？
-* 在应用场景、实践上又什么需要注意避免的？
+* 它可以当存储服务来使用吗？ 它的数据模型是怎样的? 如何持久化存储的? 
+* zookeeper服务端的读写流程是怎样实现的？
+* zookeeper c api是如何实现的？
+* 如何通过zookeeper实现分布式锁、Leader Election? 
+* 在生产环境实践中我们遇到了哪些问题？如何优化zookeeper性能? 对zookeeper进行监控？
 
-本文将结合zookeeper源码、在生产环境实践经验，深入分析以上问题。
+本文将结合zookeeper源码(3.4.6)、在生产环境实践经验，通过分析以上问题来深入理解zookeeper,以及分享我们在实践中遇到的问题及经验。
 
 首先,我们一窥zookeeper全貌，了解下其总体架构及设计目标。
 
@@ -82,8 +100,22 @@ stat等信息。
 * create/set:O(1) 
 * getchildren:O(1) 
 
-## zookeeper核心概念
+## zookeeper持久化存储
 
+
+## zookeeper核心角色及概念
+
+### leader
+
+### follower
+
+### observer
+
+### session
+
+### watcher
+
+### access control
 
 ## zookeeper server读写流程分析
 
@@ -91,9 +123,15 @@ stat等信息。
 ## zookeeper c api
 
 
-## zookeeper troubleshooting
+## 基于zookeeper实现分布式锁
 
-### zookeeper c api无法重连
+## zookeeper实践
+
+### zookeeper性能优化
+
+### zookeeper监控
+
+### troubleshooting(zookeeper c api bug)
 
 #### 问题背景
 
@@ -129,7 +167,11 @@ stat等信息。
 的状态值0，同时因为我们修复版本对未知状态也进行了处理，所以线上问题也得以修复。
 从上面zookeeper c api定义的状态可知，0是没有定义的，通过搜索zookeeper c api源代码确认了给zhandle state赋值为0的代码处，通过google也搜索到了相关[ISSUE](https://issues.apache.org/jira/browse/ZOOKEEPER-2519).
 
-### zookeeper cluster一节点cpu高负载
 
 
-## zookeeper 实践总结
+## 总结
+
+
+#### 参考资料
+* [Apache Zookeeper](https://zookeeper.apache.org/doc/r3.4.6/zookeeperOver.html)
+* [Apache ZooKeeper: the making of](https://developer.yahoo.com/blogs/hadoop/apache-zookeeper-making-417.html)
