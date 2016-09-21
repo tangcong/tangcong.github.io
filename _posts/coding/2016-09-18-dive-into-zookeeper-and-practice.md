@@ -18,7 +18,7 @@ category: coding
 
 第1、2点在节点数较少、对性能要求不高的情况下，我们可以通过将配置存储在mysql+定时轮询解决。若对性能要求较高我们就需要结合cache、agent、配置变更notify、mysql等组件实现一套配置系统来解决，如淘宝的[diamond](http://codemacro.com/2014/10/12/diamond/)。
 
-第3、第4点，在复杂的分布式环境中，我们会遇到高网络延时、网络波动、磁盘故障、机器宕机、机器半死不活、机房断电、网络分区等一系列问题，同时要避免数据不一致、脑裂，还要追求高吞吐、低延时，最大程度减少因选举leader导致服务不可用时间等，最糟糕的是分布式理论FLP(consensus is impossible with asynchronous systems and even one failure)、CAP（consistency,high availability,partition-tolerance)告诉我们需要在设计上需要权衡取舍，这些如果让业务应用程序来处理，就具有一定的复杂性。
+第3、第4点，在复杂的分布式环境中，我们会遇到高网络延时、网络波动、磁盘故障、机器宕机、机器半死不活、机房断电、网络分区等一系列问题，同时要避免数据不一致、脑裂，还要追求高吞吐、低延时，最大程度减少因选举leader导致服务不可用时间等，最糟糕的是分布式理论FLP(consensus is impossible with asynchronous systems and even one failure)、CAP（consistency,high availability,partition-tolerance)告诉我们在设计上需要权衡取舍，这些如果让业务应用程序来处理，就具有一定的复杂性。
 
 因此，这类复杂问题不适合应用程序自己解决，应用程序需要一个God,一个值得信赖的Oracle，同时God提供的Service应该尽量简单、易理解、高性能、易扩展。
 
