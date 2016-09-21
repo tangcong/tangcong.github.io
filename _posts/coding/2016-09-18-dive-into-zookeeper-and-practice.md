@@ -106,7 +106,7 @@ stat等信息。
 从数据模型我们知道zookeeper所有数据都是加载都内存，基于ConcurrentHashMap构建一颗DataTree,那么zookeeper要保证机器重启数据不丢失就需要实现持久化存储，而zookeeper的持久化实现是通过snapshot、txnlog实现的，snapshot是zookeeper内存数据的完整镜像,zookeeper在运行中会定时生成,txnlog是快照时间点之后的事物日志,zookeeper在重启时,通过snapshot和txnlog重建DataTree.
 下图是运行中的zookeeper集群的生成的数据文件。
 
-![zookeeper数据文件](/images/myblog/zk_file.jpg)
+![zookeeper数据文件](/images/myblog/zk_file.png)
 
 snapshot和log文件分布保存在哪？保留多少个snapshot和log文件? 什么时候清理废弃的snapshot和log 文件？
 这些都可以通过在zookeeper的zoo.cfg配置文件中指定，dataDir指定snapshot路径,dataLogDir指定事物日志路径，事物日志对zk吞吐量、延时有着非常大的延时，建议datadir与dataLogDir使用不同的设备，避免磁盘IO资源的争夺，影响整个系统性能和稳定性。autopurge.snapRetainCount项表示保留多少个snapshot,每个snapsho快照清理间隔小时可以通过autopurge.purgeInterval来指定。
@@ -143,7 +143,7 @@ snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的�
 		flush(toFlush);
 	}
 	
-从zookeeper持久化的基本实现可知若写请求较大会频繁生成快照，同时因为toFlush是同步刷新数据到磁盘的,所以会影响吞吐率、延时,这也是为什么txnlog使用性能较好的持久化存储硬件的原因(如SSD)。
+从zookeeper持久化的基本实现可知若写请求较大会频繁生成快照，同时因为toFlush是同步刷新数据到磁盘的,所以会影响吞吐率、延时,这也是为什么txnlog建议使用性能较好的存储硬件的原因(如SSD)。
 
 ## zookeeper核心角色及概念
 
