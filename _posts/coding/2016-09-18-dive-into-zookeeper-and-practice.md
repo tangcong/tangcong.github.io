@@ -103,6 +103,47 @@ stat等信息。
 
 ## zookeeper持久化存储
 
+从数据模型我们知道zookeeper所有数据都是加载都内存，基于ConcurrentHashMap构建一颗DataTree,那么zookeeper要保证机器重启数据不丢失就需要实现持久化存储，而zookeeper的持久化实现是通过snapshot、txnlog实现的，snapshot是zookeeper内存数据的完整镜像,zookeeper在运行中会定时生成,txnlog是快照时间点之后的事物日志,zookeeper在重启时,通过snapshot和txnlog重建DataTree.
+下图是运行中的zookeeper集群的生成的数据文件。
+
+![zookeeper数据文件](/images/myblog/zk_file.jpg)
+
+snapshot和log文件分布保存在哪？保留多少个snapshot和log文件? 什么时候清理废弃的snapshot和log 文件？
+这些都可以通过在zookeeper的zoo.cfg配置文件中指定，dataDir指定snapshot路径,dataLogDir指定事物日志路径，事物日志对zk吞吐量、延时有着非常大的延时，建议datadir与dataLogDir使用不同的设备，避免磁盘IO资源的争夺，影响整个系统性能和稳定性。autopurge.snapRetainCount项表示保留多少个snapshot,每个snapsho快照清理间隔小时可以通过autopurge.purgeInterval来指定。
+
+snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的，事物日志类TxnLog,快照类FileSnap,事物日志会追加到TxnLog,当记录数大于1000会刷到磁盘，当写入log数大于snapCount/2+randRoll(nextInt(snapCount/2)时,会开启线程将DataTree dump到磁盘,具体实现逻辑如下:
+
+	if (zks.getZKDatabase().append(si)) {
+		logCount++;
+		if (logCount > (snapCount / 2 + randRoll)) {
+			randRoll = r.nextInt(snapCount/2);
+			// roll the log
+			zks.getZKDatabase().rollLog();
+			// take a snapshot
+			if (snapInProcess != null && snapInProcess.isAlive()) {
+				LOG.warn("Too busy to snap, skipping");
+			} else {
+				snapInProcess = new Thread("Snapshot Thread") {
+						public void run() {
+							try {
+								zks.takeSnapshot();
+							} catch(Exception e) {
+								LOG.warn("Unexpected exception", e);
+							}
+						}
+					};
+				snapInProcess.start();
+			}
+			logCount = 0;
+		}
+
+	}
+	toFlush.add(si);
+	if (toFlush.size() > 1000) {
+		flush(toFlush);
+	}
+	
+从zookeeper持久化的基本实现可知若写请求较大会频繁生成快照，同时因为toFlush是同步刷新数据到磁盘的,所以会影响吞吐率、延时,这也是为什么txnlog使用性能较好的持久化存储硬件的原因(如SSD)。
 
 ## zookeeper核心角色及概念
 
@@ -120,6 +161,31 @@ stat等信息。
 
 ## zookeeper server读写流程分析
 
+在zookeeper的服务端实现中,通过抽象出leader、follower、observer共性特点，每个请求都可以按照功能拆分成各阶段，每个processor负责处理其中一个阶段，采用设计模式的职责链形式，一个processor处理完，通过队列分发到下一个processor中。processor相当于工厂各元部件，而leader、follower、observer只是使用、组装的各元部件不一致，但他们可以高度复用processor，精简实现，减少代码冗余。
+
+### 职责链处理类介绍
+
+#### FollowerRequestProcessor
+
+此处理类负责将写请求分发给leader.
+
+#### CommitProcessor
+
+#### FinalRequestProcessor
+
+#### SyncRequestProcessor
+
+#### SendAckRequestProcessor
+
+#### ToBeAppliedRequestProcessor
+
+#### ProposalRequestProcessor
+
+#### LeaderRequestProcessor
+
+### zookeeper读流程
+
+### zookeeper写流程
 
 ## zookeeper c api
 
@@ -176,3 +242,4 @@ stat等信息。
 #### 参考资料
 * [Apache Zookeeper](https://zookeeper.apache.org/doc/r3.4.6/zookeeperOver.html)
 * [Apache ZooKeeper: the making of](https://developer.yahoo.com/blogs/hadoop/apache-zookeeper-making-417.html)
+* [ZooKeeper学习之server端实现的基本骨架](http://damacheng009.iteye.com/blog/2085968)
