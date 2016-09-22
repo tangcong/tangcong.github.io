@@ -109,7 +109,7 @@ stat等信息。
 ![zookeeper数据文件](/images/myblog/zk_file.png)
 
 snapshot和log文件分布保存在哪？保留多少个snapshot和log文件? 什么时候清理废弃的snapshot和log 文件？
-这些都可以通过在zookeeper的zoo.cfg配置文件中指定，dataDir指定snapshot路径,dataLogDir指定事物日志路径，事物日志对zk吞吐量、延时有着非常大的延时，建议datadir与dataLogDir使用不同的设备，避免磁盘IO资源的争夺，影响整个系统性能和稳定性。autopurge.snapRetainCount项表示保留多少个snapshot,每个snapsho快照清理间隔小时可以通过autopurge.purgeInterval来指定。
+这些都可以通过在zookeeper的zoo.cfg配置文件中指定，dataDir指定snapshot路径,dataLogDir指定事物日志路径，事物日志对zk吞吐量、延时有着非常大的延时，建议datadir与dataLogDir使用不同的设备，避免磁盘IO资源的争夺，影响整个系统性能和稳定性。autopurge.snapRetainCount项表示保留多少个snapshot,每个snapshot快照清理间隔小时可以通过autopurge.purgeInterval来指定。
 
 snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的，事物日志类TxnLog,快照类FileSnap,事物日志会追加到TxnLog,当记录数大于1000会刷到磁盘，当写入log数大于snapCount/2+randRoll(nextInt(snapCount/2)时,会开启线程将DataTree dump到磁盘,具体实现逻辑如下:
 
@@ -161,9 +161,13 @@ snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的�
 
 ## zookeeper server读写流程分析
 
-在zookeeper的服务端实现中,通过抽象出leader、follower、observer共性特点，每个请求都可以按照功能拆分成各阶段，每个processor负责处理其中一个阶段，采用设计模式的职责链形式，一个processor处理完，通过队列分发到下一个processor中。processor相当于工厂各元部件，而leader、follower、observer只是使用、组装的各元部件不一致，但他们可以高度复用processor，精简实现，减少代码冗余。
+在zookeeper的服务端实现中,通过抽象出leader、follower、observer共性特点，读写请求的处理流程可以按照功能拆分成各阶段(pipeline)，每个processor负责处理其中一个阶段，采用设计模式的职责链形式，一个processor处理完，通过队列分发到下一个processor中。processor相当于工厂各元部件，而leader、follower、observer只是使用、组装的各元部件不一致，但他们可以高度复用相同的元部件，精简实现，减少代码冗余。
 
 ### 职责链处理类介绍
+
+#### PrepRequestProcessor
+
+此处理类根据请求的命令(create,set等)负责生成事物请求信息数据结构request,统计正在进行的事物等。
 
 #### FollowerRequestProcessor
 
@@ -171,17 +175,25 @@ snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的�
 
 #### CommitProcessor
 
-#### FinalRequestProcessor
-
 #### SyncRequestProcessor
+
+如前面持久化存储所述，此处理类负责持久化存储，将批量事物日志刷新到磁盘和定时生成快照。
 
 #### SendAckRequestProcessor
 
-#### ToBeAppliedRequestProcessor
+此处理类在收到写请求提议后，回复ACK给leader.
 
 #### ProposalRequestProcessor
 
-#### LeaderRequestProcessor
+此处理类负责将所有写请求转发给follower节点。
+
+#### ToBeAppliedRequestProcessor
+
+
+
+#### FinalRequestProcessor
+
+此处理类如名字所言，是请求流行线式处理最后一环，负责处理查询请求(从zkdatabase的DataTree读取数据)和写事务请求。
 
 ### zookeeper读流程
 
