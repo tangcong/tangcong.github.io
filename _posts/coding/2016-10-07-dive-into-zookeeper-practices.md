@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 深入理解zookeeper(实践总结篇)
-description:基于zookeeper实现配置系统,分布式锁，名称服务，性能优化，监控及troubleshooting
+description: 基于zookeeper实现配置系统,分布式锁，名称服务，性能优化，监控及troubleshooting
 category: coding
 ---
 
