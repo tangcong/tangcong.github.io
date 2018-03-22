@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 配置Ubuntu Server 16.04 
+title: 配置Ubuntu Server
 description: ubuntu,apt-get,systemctl,git,vim,go 
 category: coding
 ---
@@ -60,6 +60,7 @@ echo $tz | sudo tee /etc/timezone
 
 #### 配置文件
 
+
 ```
 /etc/network/interfaces
 /etc/resolv.conf
@@ -95,12 +96,15 @@ echo $tz | sudo tee /etc/timezone
 
 #### bashrc
 
+
 ```
 export http_proxy="xx.yy.com:port"
 export https_proxy="xx.yy.com:port"
 ```
 
+
 #### APT配置
+
 
 ```
 /etc/apt/apt.conf.d/01proxy
@@ -162,7 +166,7 @@ Acquire::http { Proxy "http://xx.yy.com:port";}
 
 #### 将GOPATH/bin目录加入到$PATH路径,gocode基本原理是client/server模式
 
-#### 通过&ltC-x&gt&ltC-o&gt开启自动提示
+#### 通过&lt;C-x&gt;&lt;C-o&gt;开启自动提示
 
 
 ## 配置OpenSSh-Server
