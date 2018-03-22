@@ -56,12 +56,14 @@ echo $tz | sudo tee /etc/timezone
 
 #### Host-Only
 
-### ubuntu network configure
+### Ubuntu Network Configure
 
 #### 配置文件
 
+```
 /etc/network/interfaces
 /etc/resolv.conf
+```
 
 #### auto-dhcp
 
@@ -69,9 +71,9 @@ echo $tz | sudo tee /etc/timezone
 
 #### netmask/gateway
 
-####  dns
+#### dns
 
-### network command
+### Network Command
 
 #### ip addr
 
@@ -89,19 +91,21 @@ echo $tz | sudo tee /etc/timezone
 
 #### nmap
 
-
 ### HTTP/HTTPS代理配置
-
-#### HTTP_PROXY/HTTPS_PROXY
 
 #### bashrc
 
+```
 export http_proxy="xx.yy.com:port"
 export https_proxy="xx.yy.com:port"
+```
 
-#### /etc/apt/apt.conf.d/01proxy
+#### APT配置
 
+```
+/etc/apt/apt.conf.d/01proxy
 Acquire::http { Proxy "http://xx.yy.com:port";}
+```
 
 
 ## 安装常用软件(GO/GIT/VIM) 
@@ -120,7 +124,7 @@ Acquire::http { Proxy "http://xx.yy.com:port";}
 ## 配置VIM插件
  常见的VIM插件管理方法
 
-### manual installation
+### Manual Installation
 
 ### Vundle
 
@@ -147,15 +151,18 @@ Acquire::http { Proxy "http://xx.yy.com:port";}
 ### guru
 
 #### GoImplements
+ 
 #### GoCallees
+
 #### GoCallers
+
 #### GoReferrers
 
 ### gocode
 
 #### 将GOPATH/bin目录加入到$PATH路径,gocode基本原理是client/server模式
 
-#### 通过<C-x><C-o>开启自动提示
+#### 通过&ltC-x&gt&ltC-o&gt开启自动提示
 
 
 ## 配置OpenSSh-Server
