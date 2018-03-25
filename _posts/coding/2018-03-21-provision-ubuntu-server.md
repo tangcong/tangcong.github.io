@@ -57,9 +57,6 @@ echo $tz | sudo tee /etc/timezone
 #### Host-Only
 
 ### Ubuntu Network Configure
-
-#### 配置文件<br>
-
 ```
 /etc/network/interfaces
 /etc/resolv.conf
@@ -93,7 +90,7 @@ echo $tz | sudo tee /etc/timezone
 
 ### HTTP/HTTPS代理配置
 
-#### bashrc<br>
+在.bashrc文件里面增加以下配置.
 
 ```
 export http_proxy="xx.yy.com:port"
@@ -101,8 +98,9 @@ export https_proxy="xx.yy.com:port"
 ```
 
 
-#### APT配置<br>
+#### APT配置
 
+在/etc/apt/apt.conf.d路径增加以下文件及内容.
 ```
 /etc/apt/apt.conf.d/01proxy
 Acquire::http { Proxy "http://xx.yy.com:port";}
