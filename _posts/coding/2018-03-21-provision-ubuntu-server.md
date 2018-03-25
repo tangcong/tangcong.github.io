@@ -171,6 +171,28 @@ Acquire::http { Proxy "http://xx.yy.com:port";}
 
 ## 配置OpenSSh-Server
 
+## MarkDown环境配置
+
+### [vim-markdown](https://github.com/plasticboy/vim-markdown)
+Syntax highlighting, matching rules and mappings for the original Markdown and extensions.
+
+    Plugin 'godlygeek/tabular'
+    Plugin 'plasticboy/vim-markdown'
+
+### [vim-markdown-preview](https://github.com/JamshedVesuna/vim-markdown-preview)
+
+A small Vim plugin for previewing markdown files in a browser.
+
+    Plugin 'JamshedVesuna/vim-markdown-preview'.
+
+
+### [grip](https://github.com/joeyespo/grip)
+
+Render local readme files before sending off to GitHub.
+```
+    pip install grip
+    grip test.md 0.0.0.0
+```
 
 ## 构建开发镜像
 
