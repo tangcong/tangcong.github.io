@@ -60,7 +60,7 @@ echo $tz | sudo tee /etc/timezone
 
 #### 配置文件
 
-
+<br>
 ```
 /etc/network/interfaces
 /etc/resolv.conf
@@ -97,6 +97,7 @@ echo $tz | sudo tee /etc/timezone
 #### bashrc
 
 
+<br>
 ```
 export http_proxy="xx.yy.com:port"
 export https_proxy="xx.yy.com:port"
@@ -106,6 +107,7 @@ export https_proxy="xx.yy.com:port"
 #### APT配置
 
 
+<br>
 ```
 /etc/apt/apt.conf.d/01proxy
 Acquire::http { Proxy "http://xx.yy.com:port";}
@@ -193,6 +195,55 @@ Render local readme files before sending off to GitHub.
     pip install grip
     grip test.md 0.0.0.0
 ```
+
+### [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/)
+
+GitHub.com uses its own version of the Markdown syntax that provides an additional set of useful features, many of which make it easier to work with content on GitHub.com.
+
+## C/C++环境配置
+
+### [Exuberant Ctags](http://ctags.sourceforge.net/)
+
+Exuberant Ctags is the latest incarnation of a [family of computer programs] ctags that scan source code files to create an index of identifiers (tags) and where they are defined. Vim uses this index (a so-called tags file) to enable you to jump to the definition of any identifier using the [Control-]] ctrl_mapping mapping.
+
+### [vim-easytags](https://github.com/xolox/vim-easytags)
+
+Automated tag file generation and syntax highlighting of tags in Vim.
+
+### [YouCompleteMe](https://github.com/Valloric/YouCompleteMe)
+
+YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for Vim.
+a Clang-based engine that provides native semantic code completion for C/C++/Objective-C/Objective-C++ (from now on referred to as "the C-family languages").
+
+### [clang_complete](https://github.com/Rip-Rip/clang_complete)
+
+Vim plugin that use clang for completing C/C++ code.
+You don't need any ctags for it to work! Only clang is needed. Clang version 2.8 or higher is recommended for c++ completion. After a . , -> and :: it is automatically trying to complete the code. :smile:
+
+### [OmniCppComplete](https://github.com/vim-scripts/OmniCppComplete)
+
+C/C++ omni-completion with ctags database. :broken_heart:
+
+### [llvm](https://llvm.org/)
+
+The LLVM Project is a collection of modular and reusable compiler and toolchain technologies. 
+
+*   LLVM Core.
+*   Clang.
+*   LLDB.
+*   libc++.
+*   compiler-rt.
+*   lld.
+
+The LLVM Core libraries provide a modern source- and target-independent optimizer, along with code generation support for many popular CPUs (as well as some less common ones!) These libraries are built around a well specified code representation known as the LLVM intermediate representation ("LLVM IR"). The LLVM Core libraries are well documented, and it is particularly easy to invent your own language (or port an existing compiler) to use LLVM as an optimizer and code generator.
+
+### [clang](https://clang.llvm.org/)
+
+Clang is an "LLVM native" C/C++/Objective-C compiler, which aims to deliver amazingly fast compiles (e.g. about 3x faster than GCC when compiling Objective-C code in a debug configuration), extremely useful error and warning messages and to provide a platform for building great source level tools. The Clang Static Analyzer is a tool that automatically finds bugs in your code, and is a great example of the sort of tool that can be built using the Clang frontend as a library to parse C/C++ code.
+
+*   Fast compiles and low memory use
+*   Expressive diagnostics
+*   GCC compatibility
 
 ## 构建开发镜像
 
