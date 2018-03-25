@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 配置Ubuntu Server
+title: 基于Ubuntu配置高效的开发环境
 description: ubuntu,apt-get,systemctl,git,vim,go 
 category: coding
 ---
