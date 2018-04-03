@@ -122,7 +122,7 @@ hgetall等慢查询操作导致业务毛刺等.
 
 redis重新建立主备关系后，发现主备KEY数量不一致.
 
-![redis主备key数量不一致](/images/myblog/redis_inconsistency.png)
+![redis主备key数量不一致](/images/myblog/redis_inconsistency.jpg)
 
 redis使用的lru算法是lazy随机式淘汰，而主备同步后，加载RDB文件时，会检查过期时间，过期时间小于当前时间会清除.
 
