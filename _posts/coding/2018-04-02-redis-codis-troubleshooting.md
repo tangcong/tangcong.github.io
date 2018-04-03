@@ -111,3 +111,40 @@ hgetall等慢查询操作导致业务毛刺等.
 业务反馈凌晨期间成功率较低.
 
 ## codis数据迁移
+
+## codis数据倾斜
+
+### 大key导致数据倾斜
+
+### crc32算法分布不均
+
+## redis主备数据不一致
+
+redis重新建立主备关系后，发现主备KEY数量不一致.
+
+![redis主备key数量不一致](/images/myblog/redis_inconsistency.png)
+
+redis使用的lru算法是lazy随机式淘汰，而主备同步后，加载RDB文件时，会检查过期时间，过期时间小于当前时间会清除.
+
+```
+        /* Check if the key already expired. This function is used when loading
+         * an RDB file from disk, either at startup, or when an RDB was
+         * received from the master. In the latter case, the master is
+         * responsible for key expiry. If we would expire keys here, the
+         * snapshot taken by the master may not be reflected on the slave. */
+        if (server.masterhost == NULL && expiretime != -1 && expiretime < now) {
+            decrRefCount(key);
+            decrRefCount(val);
+        } else {
+            /* Add the new object in the hash table */
+            dbAdd(db,key,val);
+
+            /* Set the expire time if needed */
+            if (expiretime != -1) setExpire(NULL,db,key,expiretime);
+            if (lfu_freq != -1) {
+                val->lru = (LFUGetTimeInMinutes()<<8) | lfu_freq;
+            } else {
+                /* LRU idle time loaded from RDB is in seconds. Scale
+                 * according to the LRU clock resolution this Redis
+                 * instance was compiled with (normaly 1000 ms, so the
+```
