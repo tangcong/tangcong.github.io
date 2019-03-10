@@ -37,7 +37,7 @@ category: coding
 
 * 自动化调度
 
-	用户声明服务的运行所需资源和限制后，k8s的kube-scheduler组件将对集群中的所有node进行筛选过滤，选出最佳的节点列表，无需人工费劲找机器、筛选部署
+	用户声明服务的运行所需资源和限制后，k8s的kube-scheduler组件将对集群中的所有Node进行筛选过滤，选出最佳的节点列表，无需人工费劲找机器、筛选部署
 		
 * 高度自愈能力
 
@@ -79,7 +79,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 * ETCD
 
-	K8S架构是中心化存储，ETCD保存了整个集群的状态，ETCD中数据长什么样呢？ 以ETCD2为例, example集群下分别存储了minions/node,deployment,service,configmap等K8S常见的工作负载类型和资源. 当我们在default namespace下新建了一个服务(deployment)部署nginx时，etcd中数据又会发生什么变化呢?
+	K8S架构是中心化存储，ETCD保存了整个集群的状态，ETCD中数据长什么样呢？ 以ETCD2为例, example集群下分别存储了minions/Node,deployment,service,configmap等K8S常见的工作负载类型和资源. 当我们在default namespace下新建了一个服务(deployment)部署nginx时，etcd中数据又会发生什么变化呢?
 
 	```
 	ls /cls-example
@@ -109,7 +109,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 	/cls-example/statefulsets
 	/cls-example/clusterroles
 
-	get /cls-nq7pr0e3/deployments/default/nginx
+	get /cls-example/deployments/default/nginx
 	
 	{
     "kind":"Deployment",
@@ -171,7 +171,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 	```
 
-	从etcd nginx返回的JSON对象可知，K8S API OBJECT主要由元数据metadata、规范spec和状态statu组成, 元数据metadata包含deployment name,uid,namespace等核心信息,规范spec定义了用户期待的服务运行状态，即前面所说的声明式设计思想，status是服务实际运行状态.
+	从etcd nginx返回的JSON对象可知，K8S API RESOURCE OBJECT主要由元数据metadata、规范spec和状态statu组成, 元数据metadata包含deployment name,uid,namespace等核心信息,规范spec定义了用户期待的服务运行状态，即前面所说的声明式设计思想，status是服务实际运行状态.
 
 
 * Kube-ApiServer 
@@ -197,7 +197,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 	![k8s-controller-manager](/images/myblog/k8s-cm.png)
 	
-	主要控制器如下:
+	部分控制器功能如下:
 
 	- **deployment**
 
@@ -207,7 +207,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 		负责statefulset WORKLOADS的实现.
 
-	- **nodelifecycle**
+	- **Nodelifecycle**
 
 		负责节点故障探测等生命周期管理.
 
@@ -215,7 +215,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 		负责POD水平自动扩容.
 
-	上文中一直提到的控制器，其又是怎样的工作的呢？下方给出了简明的伪代码示意图:
+	上文中一直提到的控制器，其又是怎样的工作的呢？下方给出了简明的伪代码工作示意图:
 
 	```
 
@@ -237,11 +237,11 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 * kubelet
 
-	部署在各个node上的agent,调度器将资源分配到对应的NODE后，负责POD的生命周期管理等.
+	部署在各个Node上的agent,调度器将资源分配到对应的NODE后，负责POD的生命周期管理等.
 
 * kube-proxy
 
-	部署在各个node上的proxy,提供服务发现和负载均衡能力。
+	部署在各个Node上的proxy,提供服务发现和负载均衡能力。
 
 * container runtime
 
@@ -249,13 +249,34 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 ## 托管型 vs 独立型
 
-### 托管型
+目前各大云商都提供了托管型和独立型两种集群供选择,其各自特点如下:
 
-### 独立型
+* 托管型Kubernetes
+
+只需创建Node节点，Master节点由容器服务创建并托管。具备简单、低成本(master节点无需付费)、高可用、无需运维管理Kubernetes集群Master节点的特点。
+托管型适合希望运维省心、追求低成本、专注业务应用的用户。
+
+* 独立型Kubernetes
+
+需要创建3个Master（高可用）节点及若干Node节点，可对集群基础设施进行更细粒度的控制，需要自行规划、维护、升级服务器集群。
+独立型适合对k8s比较懂、master节点需定制的、有运维技术能力、成本不敏感的用户使用。
 
 ## 集群网络 
 
+谈到K8S集群网络，首先得了解下POD的网络设计模型:
+
+* 每个POD都有独立的IP
+
+* Node节点上的POD无需NAT就可以与所有节点上的POD进行通信
+
+* NODE上的Agent等组件可以与本机上的所有POD进行
+
+* 主机网络的POD无需NAT就可以与所有节点上的POD进行通信
+
+如何实现K8S POD的网络模型呢? TKE目前支持kubenet和cni网络插件。
+
 ### kubenet 基础网络
+
 
 ### cni 高级网络
 
@@ -504,7 +525,7 @@ sha256:fc0725d04c508f404ff18c87a8e97cec567071625149098814bdedbac3e1d18e
 
 ### Horizontal Pod Autoscaler
 
-### 选择合适的node类型 
+### 选择合适的Node类型 
 
 ## CI/CD 
 
