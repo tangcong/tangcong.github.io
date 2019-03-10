@@ -22,6 +22,7 @@ category: coding
 
 ![k8s trend](/images/myblog/k8s-trend.png)
 
+
 什么是k8s? k8s有何特性? 如何用好k8s?
 
 正如上文所说k8s(kubernetes中间8个字母简写成8)是为了解决以上容器治理运维问题，用于自动化容器化应用程序的部署、扩展和管理，其核心特性如下:
@@ -66,6 +67,185 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 本文将从k8s原理初探、集群选型(托管型、集群型)、集群网络、K8S工作负载类型、服务发现、负载均衡、运行时、调度器、监控、日志、存储、成本优化等方面进行简要总结.
 
 ## K8S原理
+
+知其然知其所以然，了解k8s基本架构、工作原理有助于我们灵活运用好K8S各种特性, 在使用K8S过程中遇到问题时，能够快速进行troubleshooting，解决问题。
+
+![k8s architecture](/images/myblog/k8s-arc.png)
+
+
+如上图K8S架构图所示, k8s由以下组件组成:
+
+### Master组件
+
+* ETCD
+
+	K8S架构是中心化存储，ETCD保存了整个集群的状态，ETCD中数据长什么样呢？ 以ETCD2为例, example集群下分别存储了minions/node,deployment,service,configmap等K8S常见的工作负载类型和资源. 当我们在default namespace下新建了一个服务(deployment)部署nginx时，etcd中数据又会发生什么变化呢?
+
+	```
+	ls /cls-example
+
+	/cls-example/apiregistration.k8s.io
+	/cls-example/clusterrolebindings
+	/cls-example/services
+	/cls-example/storageclasses
+	/cls-example/daemonsets
+	/cls-example/replicasets
+	/cls-example/minions
+	/cls-example/ranges
+	/cls-example/horizontalpodautoscalers
+	/cls-example/deployments
+	/cls-example/pods
+	/cls-example/apiextensions.k8s.io
+	/cls-example/rolebindings
+	/cls-example/configmaps
+	/cls-example/roles
+	/cls-example/serviceaccounts
+	/cls-example/secrets
+	/cls-example/events
+	/cls-example/controllerrevisions
+	/cls-example/namespaces
+	/cls-example/persistentvolumeclaims
+	/cls-example/persistentvolumes
+	/cls-example/statefulsets
+	/cls-example/clusterroles
+
+	get /cls-nq7pr0e3/deployments/default/nginx
+	
+	{
+    "kind":"Deployment",
+    "apiVersion":"apps/v1",
+    "metadata":{
+        "name":"nginx",
+        "namespace":"default",
+        "uid":"df828975-09b1-11e9-af67-0a587f825bc8",
+        "generation":3,
+        "creationTimestamp":"2018-12-27T08:31:57Z",
+        "labels":{
+            "qcloud-app":"nginx"
+        },
+        "annotations":{
+            "deployment.changecourse":"RollingBack",
+            "deployment.kubernetes.io/revision":"2"
+        }
+    },
+    "spec":{
+        "replicas":3,
+        "selector":{},
+        "template":{},
+            "spec":{
+                "containers":[
+                    {
+                        "name":"nginx",
+                        "image":"nginx:v0.1",
+                        "env":[
+                            {
+                                "name":"PATH",
+                                "value":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+                            }
+                        ],
+                        "resources":{
+                            "limits":{
+                                "cpu":"500m",
+                                "memory":"1Gi"
+                            },
+                            "requests":{
+                                "cpu":"250m",
+                                "memory":"256Mi"
+                            }
+                        },
+						....
+                    }
+                ],
+            }
+        },
+        "strategy":{...},
+    },
+    "status":{
+        "observedGeneration":3,
+        "replicas":3,
+        "updatedReplicas":3,
+        "readyReplicas":3,
+        "availableReplicas":3,
+        "conditions":[...]
+    }}
+
+	```
+
+	从etcd nginx返回的JSON对象可知，K8S API OBJECT主要由元数据metadata、规范spec和状态statu组成, 元数据metadata包含deployment name,uid,namespace等核心信息,规范spec定义了用户期待的服务运行状态，即前面所说的声明式设计思想，status是服务实际运行状态.
+
+
+* Kube-ApiServer 
+
+	kube-apiserver暴露了集群的所有API，是集群的控制面板的唯一入口，提供认证、授权、权限控制等机制,其中API由WORKLOADS APIS，SERVICE APIS，CONFIG AND STORAGE APIS,METADATA APIS,CLUSTER APIS组成，其中我们最核心的WORKLOADS APIS如下:
+	
+	- **WORKLOADS APIS**
+		- Container v1 core
+		- CronJob v1beta1 batch
+		- DaemonSet v1 apps
+		- Deployment v1 apps
+		- Job v1 batch
+		- Pod v1 core
+		- ReplicaSet v1 apps
+		- ReplicationController v1 core
+		- StatefulSet v1 apps
+
+	k8s 将程序运行模型抽象成无状态服务deployment、有状态服务StatefulSet、计算任务Job、定时任务CronJob、各节点运行一个副本的服务daemonset,同时提供了强大的扩展能力，基于K8S CRD等扩展机制，用户可以自定义资源对象，构建新的WORKLOADS.
+
+* kube-controller-manager
+
+	kube-controller-manager包含一系列控制器，如下图源码所示:
+
+	![k8s-controller-manager](/images/myblog/k8s-cm.png)
+	
+	主要控制器如下:
+
+	- **deployment**
+
+		负责deployment WORKLOADS的实现.
+
+	- **statefulset**
+
+		负责statefulset WORKLOADS的实现.
+
+	- **nodelifecycle**
+
+		负责节点故障探测等生命周期管理.
+
+	- **horizontalpodautoscaling**
+
+		负责POD水平自动扩容.
+
+	上文中一直提到的控制器，其又是怎样的工作的呢？下方给出了简明的伪代码示意图:
+
+	```
+
+	while( 1 ) {
+		current state <- apiserver //从apiserver中获取程序当前状态
+		desired state <- apiserver //从apiserver中获取程序的期望状态
+		if current state != desired state { //如果当前状态不等于期望状态
+			reconcile(current state) //则进行一致性操作，使当前状态与期望状态一致
+		}
+	}
+
+	```
+
+* kube-scheduler 
+
+	负责资源调度,按照预定的调度策略、过对节点进行筛选、打分选出最佳的节点部署POD.
+
+### Node组件
+
+* kubelet
+
+	部署在各个node上的agent,调度器将资源分配到对应的NODE后，负责POD的生命周期管理等.
+
+* kube-proxy
+
+	部署在各个node上的proxy,提供服务发现和负载均衡能力。
+
+* container runtime
+
+	container runtime负责镜像管理以及Pod和容器的真正运行(CRI),如常用的dockerd.
 
 ## 托管型 vs 独立型
 
