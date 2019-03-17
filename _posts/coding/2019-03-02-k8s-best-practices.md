@@ -277,7 +277,7 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 ### kubenet 基础网络
 
-	![k8s-kubenet-network](/images/myblog/kubenet.png)
+![k8s-kubenet-network](/images/myblog/kubenet.png)
 
 如图所示，tke目前默认网络插件是kubenet, 当node加入集群时,controller-manager分配给每个node一个cidr, ipadm插件是host-local,由它来管理本机的ip分配及回收.
 
