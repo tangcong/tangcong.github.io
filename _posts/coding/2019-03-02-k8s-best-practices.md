@@ -277,6 +277,71 @@ K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很
 
 ### kubenet 基础网络
 
+	![k8s-kubenet-network](/images/myblog/kubenet.png)
+
+如图所示，tke目前默认网络插件是kubenet, 当node加入集群时,controller-manager分配给每个node一个cidr, ipadm插件是host-local,由它来管理本机的ip分配及回收.
+
+使用veth设备来连接不同namespace网络,同node不同POD间访问基于cbr0网桥,pod创建时调用kubenet网络插件,kubenet调用loopback、bridge、host-local cni标准插件，实现lo设备添加、veth设备连接到cbr0网桥、ip地址分配等.
+
+
+```
+brctl show cbr0
+
+bridge name	bridge id		STP enabled	interfaces
+cbr0		8000.0a58ac140301	no		veth3eb8df72
+							veth438fda9b
+							vethf9fe59ba
+
+```
+
+正如上面所描述,kubnet并不能实现跨node pod间访问，tke是如何实现跨node访问的呢?
+
+kubenet需要基于cloud provider的vpc路由规则才能实现跨node访问，tke使用的vpc global route.
+controller-manager分配cidr给加入集群的node时,会调用vpc的接口下发全局路由，比如node 1,pod cidr 172.20.1.0/24, 用户vpc任意node访问此cidr时请求都会被转发到node 1,10.0.0.10.
+
+pod1(172.20.1.2)访问pod3(172.20.2.2)简要流程如下:
+
+pod 1及node 1路由分别如下:
+
+
+```
+default via 172.20.1.2 dev eth0
+172.20.1.0/24 dev eth0 scope link  src 172.20.1.2
+
+```
+
+```
+
+default via 10.0.0.10 dev eth0
+10.0.0.0/20 dev eth0  proto kernel  scope link  src 10.0.0.10
+172.20.1.0/24 dev cbr0  proto kernel  scope link  src 172.20.1.0
+
+```
+
+* pod 1未匹配到172.20.2.2路由，包从默认eth0设备发出
+* node 1上也未匹配到目的ip的路由规则，包从node 1默认eth0设备发出
+* 母机发现此目的ip 匹配到路由172.20.2.0/24,将包发完node 2(10.0.0.11)
+* 包进入node 2后匹配到cbr0的路由规则，将包分发给cbr0
+* cbr0根据arp表将包转发给对应的veth设备，转发到pod 3
+
+
+#### FAQ
+
+* 加入node失败
+
+	当pod cidr耗尽，分配失败时, 会导致无法加入新节点
+
+* 创建service失败,无法分配ip
+
+	tke创建集群时，会让用户填写最大pod数/service数,容器子网等，整个容器子网资源由pod cidr  + service cidr组成,若service cidr较小而service比较多时会导致创建service失败.
+
+* 容器网段与用户vpc cidr冲突,导致用户访问异常
+
+	创建集群时若选择的cidr与用户vpc已有cidr冲突，将导致用户vpc相关网段访问异常，容器下发的路由具有最高优先级。
+
+#### 最佳实践
+
+由以上问题可知，创建集群时根据需要选择合理的容器子网非常重要，尽量提前做好容量规划，避免容器与vpc cidr冲突，减少不必要的麻烦。
 
 ### cni 高级网络
 
