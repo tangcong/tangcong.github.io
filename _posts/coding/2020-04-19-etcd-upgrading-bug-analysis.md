@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 升级集群导致ETCD数据不一致/毁坏案例分析
+title: 升级集群导致ETCD数据不一致分析
 description: etcd,raft,boltdb,data inconsistency
 category: coding
 ---
