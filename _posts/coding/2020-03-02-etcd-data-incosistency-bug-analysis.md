@@ -5,9 +5,9 @@ description: etcd,raft,boltdb,data inconsistency
 category: coding
 ---
 
-# etcd数据不一致bug案例分析
+## etcd数据不一致bug案例分析
 
-简单总结目前几个已知的etcd数据不一致案例，后续持续更新。
+简单总结目前几个已知的etcd数据不一致案例,以及相关排查思路，后续持续更新。
 
 ### [mvcc: fix rev inconsistency](https://github.com/etcd-io/etcd/pull/6633)
 
@@ -25,3 +25,8 @@ auth操作重放导致auth revision不一致，进而导致mvcc数据不一致�
 
 当从3.2及以下版本升级到3.3及以上版本的时候，如果开启了鉴权，并且使用了lease,lease ttl且较短，那么较大概率导致3.3版本的lease无对法删除，因为3.3对
 lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的时候,lease过期则导致3.3无法清理，进而导致revision不一致，最终依赖revision的相关事务写操作失败。
+
+### 总结
+
+如果一个特性在不同版本间不兼容，并且涉及到revision变更(考虑间接和直接因素），则很可能会引发数据不一致.比如之前我们在pr里面优化了一个接口使其
+幂等性，但考虑到这个在不同版本间行为不一样，会导致auth revision不一致，最后还是将其revert了。
