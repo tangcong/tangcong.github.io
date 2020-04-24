@@ -15,7 +15,7 @@ category: coding
 进而导致鉴权版本号不一致，放大导致mvcc数据不一致，客户端表现写进去数据读取不到。
 
 问题详细描述如下:
-[issue](https://github.com/etcd-io/etcd/issues/11689)
+[issue](https://github.com/etcd-io/etcd/issues/11651)
 
 为了解决以上问题以及提高后续定位不一致问题的效率，我们提了以下几个PR。
 
