@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>redis on TangCong Blog</title>
+    <link>https://tangcong.github.io/tags/redis/</link>
+    <description>Recent content in redis on TangCong Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 02 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://tangcong.github.io/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>redis/codis troubleshooting总结</title>
+      <link>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</link>
+      <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</guid>
+      <description>redis主备同步失败 线上某两实例重新建立主备关系时,出现如下错误 23203:S 02 Apr 14:27:53.148 * MASTER &amp;lt;-&amp;gt; SLAVE sync started 23203:S 02 Apr 14:27:53.148 * Non blocking connect for SYNC fired the event. 23203:S 02 Apr 14:27:53.148 * Master replied to PING, replication can continue... 23203:S 02</description>
+    </item>
+    
+    <item>
+      <title>大规模排行榜系统实践及挑战</title>
+      <link>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</link>
+      <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</guid>
+      <description>如何支持业务就近接入？低延时? 如何支撑数万乃至百万级排行榜申请? 如何降低机器成本？选择合适存储引擎？ 如何避免各业务资源抢占，相互影响？ 原文发</description>
+    </item>
+    
+  </channel>
+</rss>

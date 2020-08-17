@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://tangcong.github.io//img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io//img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="kubernetes best practices" />
+    <meta property="og:title" content="kubernetes best practices" />
+    <meta property="twitter:title" content="kubernetes best practices" />
+    
+
+    
+    <meta name="description" content="k8s,kubernetes,practice,docker,image,deployment,high availbility">
+    <meta property="og:description" content="k8s,kubernetes,practice,docker,image,deployment,high availbility" />
+    <meta property="twitter:description" content="k8s,kubernetes,practice,docker,image,deployment,high availbility" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>kubernetes best practices-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/post/2019-03-02-k8s-best-practices/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                    </div>
+                    <h1>kubernetes best practices</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Saturday, March 2, 2019
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#k8s原理">K8S原理</a></li>
+        <li><a href="#托管型-vs-独立型">托管型 vs 独立型</a></li>
+        <li><a href="#集群网络">集群网络</a></li>
+        <li><a href="#应用">应用</a></li>
+        <li><a href="#服务负载均衡">服务负载均衡</a></li>
+        <li><a href="#调度">调度</a></li>
+        <li><a href="#存储">存储</a></li>
+        <li><a href="#监控">监控</a></li>
+        <li><a href="#成本优化">成本优化</a></li>
+        <li><a href="#cicd">CI/CD</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#日志">日志</a></li>
+        <li><a href="#事件">事件</a></li>
+        <li><a href="#trouble-shooting">Trouble Shooting</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <h2 id="背景">背景</h2>
+<p>2013年docker横空出世，正如其口号build,ship,run,其创新地提出将程序运行环境依赖打包为镜像,解决程序部署环境依赖、可移植问题，构建镜像仓库, 实现程序快速分发交付，全球可部署，并结合linux kernel cgroup/namespace等技术，解决程序运行资源隔离、相比虚拟机更高的资源利用率等问题. 凭着以上技术优势，docker在技术圈掀起了容器化热潮，成为现今最火热的技术话题, 带动整个容器社区蓬勃发展。</p>
+<p>虽然docker在应用程序打包、分发、快速启动并可实现轻量级资源隔离方面表现出色，但它仅仅是一个镜像构建、容器启动的工具，无法解决以下问题:</p>
+<ul>
+<li>容器如何扩缩容？</li>
+<li>容器故障如何自愈？</li>
+<li>容器如何做负载均衡和服务发现？</li>
+<li>容器间如何访问？</li>
+<li>如何基于容器进行发布? 支持多种发布策略?</li>
+<li>&hellip;&hellip;</li>
+</ul>
+<p>技术社区为了解决以上容器治理、运维等问题，先后诞生了k8s、docker swarm等容器平台，其中k8s是建立在google运行生产工作量15年的经验基础上(borg)，并结合社区中的最佳创意和实践而实现,swarm是docker公司推出的docker多机集群版。如下图google指数所示，docker依然是技术圈热点, 用户在k8s、swarm的选择上，google主导的k8s很明显已经成为主流.</p>
+<p><img src="/img/k8s-trend.png" alt="k8s trend"></p>
+<p>什么是k8s? k8s有何特性? 如何用好k8s?</p>
+<p>正如上文所说k8s(kubernetes中间8个字母简写成8)是为了解决以上容器治理运维问题，用于自动化容器化应用程序的部署、扩展和管理，其核心特性如下:</p>
+<ul>
+<li>
+<p>设计思想之声明式</p>
+<p>用户通过一个配置文件声明服务期待的运行状态即可,如副本数,在机器死机等异常情况下k8s会尽力确保现状与预期一致,无需人工干预处理</p>
+</li>
+<li>
+<p>服务发现、负载均衡</p>
+<p>在k8s中部署目标服务后，其他服务可通过dns/环境变量等机制访问目标服务，k8s的kube-proxy组件实现了多种负载均衡机制，无需关注后端POD扩缩容等变化</p>
+</li>
+<li>
+<p>自动化调度</p>
+<p>用户声明服务的运行所需资源和限制后，k8s的kube-scheduler组件将对集群中的所有Node进行筛选过滤，选出最佳的节点列表，无需人工费劲找机器、筛选部署</p>
+</li>
+<li>
+<p>高度自愈能力</p>
+<p>POD异常时会自动重启.
+在配置健康检查后,健康检查失败后会kill容器重启.
+无状态服务当机器死机等异常情况下会自动调度到新节点.</p>
+</li>
+<li>
+<p>自动化扩容</p>
+<p>当服务cpu等资源达到用户配置的阈值后将触发自动化扩容，低于预期时进行缩容操作，告别人工扩容时代
+集群节点资源不顾时，也可触发集群NODE扩容，避免因资源不够而导致的部署、扩容失败等</p>
+</li>
+<li>
+<p>自动化发布和回滚</p>
+<p>k8s将常用的无状态逻辑服务抽象成一种Workload,命名为Deployment, 基于其实现了自动化的增量更新等多种策略的发布机制,并且在发布过程支持暂停、恢复。</p>
+</li>
+<li>
+<p>秘钥和配置管理</p>
+<p>k8s通过secret和configmap来管理程序所需要的敏感信息和常用的配置文件。</p>
+</li>
+<li>
+<p>存储编排</p>
+<p>Kubernetes的PVC(Persistent Volume Claim)对象实现了将不同云、不同分布式存储系统，提供的存储能力抽象成统一的接口,实现了资源提供方和使用方解耦。</p>
+</li>
+</ul>
+<p>K8S特性丰富强大的同时也意味着其实现复杂度相比swarm要高很多，用户对其把控难度也加大，我们在使用其强大功能、提高生产力的同时，又该如何避免采坑、灵活用好K8S呢？</p>
+<p>本文将从k8s原理初探、集群选型(托管型、集群型)、集群网络、K8S工作负载类型、服务发现、负载均衡、运行时、调度器、监控、日志、存储、成本优化等方面进行简要总结.</p>
+<h2 id="k8s原理">K8S原理</h2>
+<p>知其然知其所以然，了解k8s基本架构、工作原理有助于我们灵活运用好K8S各种特性, 在使用K8S过程中遇到问题时，能够快速进行troubleshooting，解决问题。</p>
+<p><img src="/img/k8s-arc.png" alt="k8s architecture"></p>
+<p>如上图K8S架构图所示, k8s由以下组件组成:</p>
+<h3 id="master组件">Master组件</h3>
+<ul>
+<li>
+<p>ETCD</p>
+<p>K8S架构是中心化存储，ETCD保存了整个集群的状态，ETCD中数据长什么样呢？ 以ETCD2为例, example集群下分别存储了minions/Node,deployment,service,configmap等K8S常见的工作负载类型和资源. 当我们在default namespace下新建了一个服务(deployment)部署nginx时，etcd中数据又会发生什么变化呢?</p>
+<pre><code>ls /cls-example
+
+/cls-example/apiregistration.k8s.io
+/cls-example/clusterrolebindings
+/cls-example/services
+/cls-example/storageclasses
+/cls-example/daemonsets
+/cls-example/replicasets
+/cls-example/minions
+/cls-example/ranges
+/cls-example/horizontalpodautoscalers
+/cls-example/deployments
+/cls-example/pods
+/cls-example/apiextensions.k8s.io
+/cls-example/rolebindings
+/cls-example/configmaps
+/cls-example/roles
+/cls-example/serviceaccounts
+/cls-example/secrets
+/cls-example/events
+/cls-example/controllerrevisions
+/cls-example/namespaces
+/cls-example/persistentvolumeclaims
+/cls-example/persistentvolumes
+/cls-example/statefulsets
+/cls-example/clusterroles
+
+get /cls-example/deployments/default/nginx
+  
+{
+&quot;kind&quot;:&quot;Deployment&quot;,
+&quot;apiVersion&quot;:&quot;apps/v1&quot;,
+&quot;metadata&quot;:{
+    &quot;name&quot;:&quot;nginx&quot;,
+    &quot;namespace&quot;:&quot;default&quot;,
+    &quot;uid&quot;:&quot;df828975-09b1-11e9-af67-0a587f825bc8&quot;,
+    &quot;generation&quot;:3,
+    &quot;creationTimestamp&quot;:&quot;2018-12-27T08:31:57Z&quot;,
+    &quot;labels&quot;:{
+        &quot;qcloud-app&quot;:&quot;nginx&quot;
+    },
+    &quot;annotations&quot;:{
+        &quot;deployment.changecourse&quot;:&quot;RollingBack&quot;,
+        &quot;deployment.kubernetes.io/revision&quot;:&quot;2&quot;
+    }
+},
+&quot;spec&quot;:{
+    &quot;replicas&quot;:3,
+    &quot;selector&quot;:{},
+    &quot;template&quot;:{},
+        &quot;spec&quot;:{
+            &quot;containers&quot;:[
+                {
+                    &quot;name&quot;:&quot;nginx&quot;,
+                    &quot;image&quot;:&quot;nginx:v0.1&quot;,
+                    &quot;env&quot;:[
+                        {
+                            &quot;name&quot;:&quot;PATH&quot;,
+                            &quot;value&quot;:&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;
+                        }
+                    ],
+                    &quot;resources&quot;:{
+                        &quot;limits&quot;:{
+                            &quot;cpu&quot;:&quot;500m&quot;,
+                            &quot;memory&quot;:&quot;1Gi&quot;
+                        },
+                        &quot;requests&quot;:{
+                            &quot;cpu&quot;:&quot;250m&quot;,
+                            &quot;memory&quot;:&quot;256Mi&quot;
+                        }
+                    },
+                    ....
+                }
+            ],
+        }
+    },
+    &quot;strategy&quot;:{...},
+},
+&quot;status&quot;:{
+    &quot;observedGeneration&quot;:3,
+    &quot;replicas&quot;:3,
+    &quot;updatedReplicas&quot;:3,
+    &quot;readyReplicas&quot;:3,
+    &quot;availableReplicas&quot;:3,
+    &quot;conditions&quot;:[...]
+}}
+
+</code></pre><pre><code>
+ 从etcd nginx返回的JSON对象可知，K8S API RESOURCE OBJECT主要由元数据metadata、规范spec和状态statu组成, 元数据metadata包含deployment name,uid,namespace等核心信息,规范spec定义了用户期待的服务运行状态，即前面所说的声明式设计思想，status是服务实际运行状态.
+
+
+</code></pre></li>
+<li>
+<p>Kube-ApiServer</p>
+<p>kube-apiserver暴露了集群的所有API，是集群的控制面板的唯一入口，提供认证、授权、权限控制等机制,其中API由WORKLOADS APIS，SERVICE APIS，CONFIG AND STORAGE APIS,METADATA APIS,CLUSTER APIS组成，其中我们最核心的WORKLOADS APIS如下:</p>
+<ul>
+<li><strong>WORKLOADS APIS</strong>
+<ul>
+<li>Container v1 core</li>
+<li>CronJob v1beta1 batch</li>
+<li>DaemonSet v1 apps</li>
+<li>Deployment v1 apps</li>
+<li>Job v1 batch</li>
+<li>Pod v1 core</li>
+<li>ReplicaSet v1 apps</li>
+<li>ReplicationController v1 core</li>
+<li>StatefulSet v1 apps</li>
+</ul>
+</li>
+</ul>
+<p>k8s 将程序运行模型抽象成无状态服务deployment、有状态服务StatefulSet、计算任务Job、定时任务CronJob、各节点运行一个副本的服务daemonset,同时提供了强大的扩展能力，基于K8S CRD等扩展机制，用户可以自定义资源对象，构建新的WORKLOADS.</p>
+</li>
+<li>
+<p>kube-controller-manager</p>
+<p>kube-controller-manager包含一系列控制器，如下图源码所示:</p>
+<p><img src="/img/k8s-cm.png" alt="k8s-controller-manager"></p>
+<p>部分控制器功能如下:</p>
+<ul>
+<li>
+<p><strong>deployment</strong></p>
+<p>负责deployment WORKLOADS的实现.</p>
+</li>
+<li>
+<p><strong>statefulset</strong></p>
+<p>负责statefulset WORKLOADS的实现.</p>
+</li>
+<li>
+<p><strong>Nodelifecycle</strong></p>
+<p>负责节点故障探测等生命周期管理.</p>
+</li>
+<li>
+<p><strong>horizontalpodautoscaling</strong></p>
+<p>负责POD水平自动扩容.</p>
+</li>
+</ul>
+<p>上文中一直提到的控制器，其又是怎样的工作的呢？下方给出了简明的伪代码工作示意图:</p>
+<pre><code>
+while( 1 ) {
+    current state &lt;- apiserver //从apiserver中获取程序当前状态
+    desired state &lt;- apiserver //从apiserver中获取程序的期望状态
+    if current state != desired state { //如果当前状态不等于期望状态
+        reconcile(current state) //则进行一致性操作，使当前状态与期望状态一致
+    }
+}
+
+</code></pre><pre><code>
+</code></pre></li>
+<li>
+<p>kube-scheduler</p>
+<p>负责资源调度,按照预定的调度策略、过对节点进行筛选、打分选出最佳的节点部署POD.</p>
+</li>
+</ul>
+<h3 id="node组件">Node组件</h3>
+<ul>
+<li>
+<p>kubelet</p>
+<p>部署在各个Node上的agent,调度器将资源分配到对应的NODE后，负责POD的生命周期管理等.</p>
+</li>
+<li>
+<p>kube-proxy</p>
+<p>部署在各个Node上的proxy,提供服务发现和负载均衡能力。</p>
+</li>
+<li>
+<p>container runtime</p>
+<p>container runtime负责镜像管理以及Pod和容器的真正运行(CRI),如常用的dockerd.</p>
+</li>
+</ul>
+<h2 id="托管型-vs-独立型">托管型 vs 独立型</h2>
+<p>目前各大云商都提供了托管型和独立型两种集群供选择,其各自特点如下:</p>
+<ul>
+<li>托管型Kubernetes</li>
+</ul>
+<p>只需创建Node节点，Master节点由容器服务创建并托管。具备简单、低成本(master节点无需付费)、高可用、无需运维管理Kubernetes集群Master节点的特点。
+托管型适合希望运维省心、追求低成本、专注业务应用的用户。</p>
+<ul>
+<li>独立型Kubernetes</li>
+</ul>
+<p>需要创建3个Master（高可用）节点及若干Node节点，可对集群基础设施进行更细粒度的控制，需要自行规划、维护、升级服务器集群。
+独立型适合对k8s比较懂、master节点需定制的、有运维技术能力、成本不敏感的用户使用。</p>
+<h2 id="集群网络">集群网络</h2>
+<p>谈到K8S集群网络，首先得了解下POD的网络设计模型:</p>
+<ul>
+<li>
+<p>每个POD都有独立的IP</p>
+</li>
+<li>
+<p>Node节点上的POD无需NAT就可以与所有节点上的POD进行通信</p>
+</li>
+<li>
+<p>NODE上的Agent等组件可以与本机上的所有POD进行</p>
+</li>
+<li>
+<p>主机网络的POD无需NAT就可以与所有节点上的POD进行通信</p>
+</li>
+</ul>
+<p>如何实现K8S POD的网络模型呢? TKE目前支持kubenet和cni网络插件。</p>
+<h3 id="kubenet-基础网络">kubenet 基础网络</h3>
+<p><img src="/img/kubenet.png" alt="k8s-kubenet-network"></p>
+<p>如图所示，tke目前默认网络插件是kubenet, 当node加入集群时,controller-manager分配给每个node一个cidr, ipadm插件是host-local,由它来管理本机的ip分配及回收.</p>
+<p>使用veth设备来连接不同namespace网络,同node不同POD间访问基于cbr0网桥,pod创建时调用kubenet网络插件,kubenet调用loopback、bridge、host-local cni标准插件，实现lo设备添加、veth设备连接到cbr0网桥、ip地址分配等.</p>
+<pre><code>brctl show cbr0
+
+bridge name	bridge id		STP enabled	interfaces
+cbr0		8000.0a58ac140301	no		veth3eb8df72
+							veth438fda9b
+							vethf9fe59ba
+
+</code></pre><p>正如上面所描述,kubnet并不能实现跨node pod间访问，tke是如何实现跨node访问的呢?</p>
+<p>kubenet需要基于cloud provider的vpc路由规则才能实现跨node访问，tke使用的vpc global route.
+controller-manager分配cidr给加入集群的node时,会调用vpc的接口下发全局路由，比如node 1,pod cidr 172.20.1.0/24, 用户vpc任意node访问此cidr时请求都会被转发到node 1,10.0.0.10.</p>
+<p>pod1(172.20.1.2)访问pod3(172.20.2.2)简要流程如下:</p>
+<p>pod 1及node 1路由分别如下:</p>
+<pre><code>default via 172.20.1.2 dev eth0
+172.20.1.0/24 dev eth0 scope link  src 172.20.1.2
+
+</code></pre><pre><code>
+default via 10.0.0.10 dev eth0
+10.0.0.0/20 dev eth0  proto kernel  scope link  src 10.0.0.10
+172.20.1.0/24 dev cbr0  proto kernel  scope link  src 172.20.1.0
+
+</code></pre><ul>
+<li>pod 1未匹配到172.20.2.2路由，包从默认eth0设备发出</li>
+<li>node 1上也未匹配到目的ip的路由规则，包从node 1默认eth0设备发出</li>
+<li>母机发现此目的ip 匹配到路由172.20.2.0/24,将包发完node 2(10.0.0.11)</li>
+<li>包进入node 2后匹配到cbr0的路由规则，将包分发给cbr0</li>
+<li>cbr0根据arp表将包转发给对应的veth设备，转发到pod 3</li>
+</ul>
+<h4 id="faq">FAQ</h4>
+<ul>
+<li>
+<p>加入node失败</p>
+<p>当pod cidr耗尽，分配失败时, 会导致无法加入新节点</p>
+</li>
+<li>
+<p>创建service失败,无法分配ip</p>
+<p>tke创建集群时，会让用户填写最大pod数/service数,容器子网等，整个容器子网资源由pod cidr  + service cidr组成,若service cidr较小而service比较多时会导致创建service失败.</p>
+</li>
+<li>
+<p>容器网段与用户vpc cidr冲突,导致用户访问异常</p>
+<p>创建集群时若选择的cidr与用户vpc已有cidr冲突，将导致用户vpc相关网段访问异常，容器下发的路由具有最高优先级。</p>
+</li>
+</ul>
+<h4 id="最佳实践">最佳实践</h4>
+<p>由以上问题可知，创建集群时根据需要选择合理的容器子网非常重要，尽量提前做好容量规划，避免容器与vpc cidr冲突，减少不必要的麻烦。</p>
+<h3 id="cni-高级网络">cni 高级网络</h3>
+<h3 id="网络规划">网络规划</h3>
+<h3 id="网络策略">网络策略</h3>
+<h2 id="应用">应用</h2>
+<h3 id="pod">POD</h3>
+<h3 id="deployment">Deployment</h3>
+<h3 id="statefulset">Statefulset</h3>
+<h3 id="jobcronjob">JOB/CRONJOB</h3>
+<h3 id="crd">CRD</h3>
+<h3 id="tips">TIPS</h3>
+<h4 id="image">IMAGE</h4>
+<p>镜像核心技术分层、写时复制(COW)</p>
+<ul>
+<li>docker images
+根据镜像命查出镜像ID</li>
+</ul>
+<pre><code>docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+busybox             latest              d8233ab899d4        3 weeks ago         1.2MB
+
+/var/lib/docker//aufs/imagedb/content/sha256/d8233ab899d419c58cf3634c0df54ff5d8acc28f8173f09c21df4a07229e1205
+
+根据镜像ID查出每层ID
+</code></pre><p>docker inspect d8233ab899d4</p>
+<pre><code>
+&quot;RootFS&quot;: {
+		&quot;Type&quot;: &quot;layers&quot;,
+				&quot;Layers&quot;: [
+						&quot;sha256:adab5d09ba79ecf30d3a5af58394b23a447eda7ffffe16c500ddc5ccb4c0222f&quot;
+				]
+}
+
+从layerdb里面查出真实的id
+
+/var/lib/docker/image/aufs/layerdb/sha256/adab5d09ba79ecf30d3a5af58394b23a447eda7ffffe16c500ddc5ccb4c0222f
+diff:adab5d09ba79ecf30d3a5af58394b23a447eda7ffffe16c500ddc5ccb4c0222f
+
+cacheid:5ea6da2b6b8b51e6d328e9c141641e8840469860e6225ac8f94918728b3fcb86
+
+从diff里面查出真实的层内容
+root@VM-0-17-ubuntu:/var/lib/docker/aufs/diff# ls | xargs ls
+5ea6da2b6b8b51e6d328e9c141641e8840469860e6225ac8f94918728b3fcb86:
+bin  dev  etc  home  root  tmp	usr  var
+
+运行挂载数据卷容器
+docker run -it --rm --name test -v /data  busybox
+
+root@VM-0-17-ubuntu:/var/lib/docker# docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+8ca5daf4a0d7        busybox             &quot;sh&quot;                21 minutes ago      Up 21 minutes                           test
+
+/var/lib/docker/containers/8ca5daf4a0d71c1f640410098b5ddf6a04a37282eb95e0e17ad6bcdbfc305099/config.v2.json
+
+&quot;MountPoints&quot;: {
+		&quot;/data&quot;: {
+				&quot;Destination&quot;: &quot;/data&quot;,
+						&quot;Driver&quot;: &quot;local&quot;,
+						&quot;ID&quot;: &quot;c1ef4db96eac11e9c6416bf21aa46b9088b30be82e345f1e25bfcd0623851a66&quot;,
+						&quot;Name&quot;: &quot;afeead734780b7b545b1fbc9b2d78bc0b94d792cecce031c6fedbe2ea8798767&quot;,
+						&quot;RW&quot;: true,
+						&quot;Source&quot;: &quot;&quot;,
+						&quot;Spec&quot;: {},
+						&quot;Type&quot;: &quot;volume&quot;
+		}
+}
+
+
+/ # cd /data
+/data # ls
+/data # touch hello
+/data # touch world
+/etc # echo &quot;hello,etcd&quot; &gt; etcd
+/etc # ls
+etcd         group        hostname     hosts        localtime    mtab         network      passwd       resolv.conf  shadow
+/etc # touch test
+
+cat /var/lib/docker/image/aufs/layerdb/mounts/8ca5daf4a0d71c1f640410098b5ddf6a04a37282eb95e0e17ad6bcdbfc305099/init-id
+6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40-init
+
+cat /var/lib/docker/image/aufs/layerdb/mounts/8ca5daf4a0d71c1f640410098b5ddf6a04a37282eb95e0e17ad6bcdbfc305099/mount-id
+6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40
+
+root@VM-0-17-ubuntu:/var/lib/docker/aufs/diff# tree 6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40-init
+6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40-init
+├── dev
+│   ├── console
+│   ├── pts
+│   └── shm
+├── etc
+│   ├── hostname
+│   ├── hosts
+│   ├── mtab -&gt; /proc/mounts
+│   └── resolv.conf
+├── proc
+└── sys
+
+6 directories, 5 files
+root@VM-0-17-ubuntu:/var/lib/docker/aufs/diff# tree 6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40
+6dd5150e7562beb04675a16b72ae38f8fce68e8a98f773f3fdfbb5d81efd2a40
+├── data
+├── etc
+│   ├── etcd
+│   └── test
+└── root
+
+3 directories, 2 files
+
+
+root@VM-0-17-ubuntu:/var/lib/docker/volumes/afeead734780b7b545b1fbc9b2d78bc0b94d792cecce031c6fedbe2ea8798767# tree
+.
+└── _data
+    ├── hello
+    └── world
+
+1 directory, 2 files
+
+docker commit  8ca5daf4a0d7 busybox:v1
+
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+busybox             v1                  2251e265458e        6 minutes ago       1.2MB
+busybox             latest              d8233ab899d4        3 weeks ago         1.2MB
+
+docker inspect 2251e265458e
+
+&quot;RootFS&quot;: {
+		&quot;Type&quot;: &quot;layers&quot;,
+				&quot;Layers&quot;: [
+			    &quot;sha256:adab5d09ba79ecf30d3a5af58394b23a447eda7ffffe16c500ddc5ccb4c0222f&quot;,
+				&quot;sha256:fc0725d04c508f404ff18c87a8e97cec567071625149098814bdedbac3e1d18e&quot;
+		]
+}
+
+image/aufs/layerdb/sha256/18c355f51195ccddefab80eb9fdbd0ecc09184faf6f6b287cbbabc04319a4f35/diff:1:sha256:fc0725d04c508f404ff18c87a8e97cec567071625149098814bdedbac3e1d18e
+
+root@VM-0-17-ubuntu:/var/lib/docker/image/aufs/layerdb/sha256/18c355f51195ccddefab80eb9fdbd0ecc09184faf6f6b287cbbabc04319a4f35# tree
+.
+├── cache-id
+├── diff
+├── parent
+├── size
+└── tar-split.json.gz
+
+cat /var/lib/docker/aufs/diff/8d2106cbb0020c11873c14eb3018f33be8aa300e73cdde801d3f7ed5444dac54
+
+/var/lib/docker/aufs/diff/8d2106cbb0020c11873c14eb3018f33be8aa300e73cdde801d3f7ed5444dac54
+├── data
+├── etc
+│   ├── etcd
+│   └── test
+└── root
+
+root@VM-0-17-ubuntu:/var/lib/docker/image/aufs/layerdb/sha256/18c355f51195ccddefab80eb9fdbd0ecc09184faf6f6b287cbbabc04319a4f35# cat parent
+sha256:adab5d09ba79ecf30d3a5af58394b23a447eda7ffffe16c500ddc5ccb4c0222f
+
+root@VM-0-17-ubuntu:/var/lib/docker/image/aufs/layerdb/sha256/18c355f1195ccddefab80eb9fdbd0ecc09184faf6f6b287cbbabc04319a4f35# cat cache-id
+8d2106cbb0020c11873c14eb3018f33be8aa300e73cdde801d3f7ed5444dac54
+
+root@VM-0-17-ubuntu:/var/lib/docker/image/aufs/layerdb/sha256/18c355f51195ccddefab80eb9fdbd0ecc09184faf6f6b287cbbabc04319a4f35# cat diff
+sha256:fc0725d04c508f404ff18c87a8e97cec567071625149098814bdedbac3e1d18e
+
+
+</code></pre><h4 id="精简镜像大小">精简镜像大小</h4>
+<h4 id="镜像版本打tag勿使用latest">镜像版本打tag,勿使用latest</h4>
+<h4 id="配置readiness-and-liveness-probes">配置Readiness and Liveness Probes</h4>
+<h4 id="使用helm-charts部署">使用Helm Charts部署</h4>
+<h4 id="不同环境业务通过namespace隔离">不同环境、业务通过namespace隔离</h4>
+<h4 id="灵活使用label">灵活使用LABEL</h4>
+<h4 id="不要用root权限运行容器">不要用root权限运行容器</h4>
+<h4 id="日志输出到stdoutstderr">日志输出到stdout,stderr</h4>
+<h2 id="服务负载均衡">服务负载均衡</h2>
+<h3 id="iptables">iptables</h3>
+<h3 id="ipvs">ipvs</h3>
+<h3 id="四层lb">四层lb</h3>
+<h3 id="七层lb">七层lb</h3>
+<h2 id="调度">调度</h2>
+<h3 id="node-selector">Node Selector</h3>
+<h3 id="node-taint">Node Taint</h3>
+<h3 id="extender-scheduler">Extender Scheduler</h3>
+<h2 id="存储">存储</h2>
+<h3 id="cbs云盘">CBS云盘</h3>
+<h3 id="nfs">NFS</h3>
+<h3 id="host-path">HOST PATH</h3>
+<h3 id="empty-dir">EMPTY DIR</h3>
+<h3 id="local-pv">LOCAL PV</h3>
+<h2 id="监控">监控</h2>
+<h3 id="平台告警策略">平台告警策略</h3>
+<h4 id="容器">容器</h4>
+<h4 id="节点">节点</h4>
+<h4 id="服务">服务</h4>
+<h4 id="集群">集群</h4>
+<h4 id="pod-1">POD</h4>
+<h3 id="promethues--grafana">Promethues + Grafana</h3>
+<h2 id="成本优化">成本优化</h2>
+<h3 id="cluster-autoscaler">Cluster Autoscaler</h3>
+<h3 id="horizontal-pod-autoscaler">Horizontal Pod Autoscaler</h3>
+<h3 id="选择合适的node类型">选择合适的Node类型</h3>
+<h2 id="cicd">CI/CD</h2>
+<h2 id="security">Security</h2>
+<h2 id="日志">日志</h2>
+<h2 id="事件">事件</h2>
+<h2 id="trouble-shooting">Trouble Shooting</h2>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2019-01-13-k8s-proxy-how-to-work/" data-toggle="tooltip" data-placement="top" title="k8s-proxy how to work">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/post/2020-03-02-etcd-data-incosistency-bug-analysis/" data-toggle="tooltip" data-placement="top" title="etcd数据不一致bug分析汇总">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

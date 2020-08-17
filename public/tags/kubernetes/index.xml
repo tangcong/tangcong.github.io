@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on TangCong Blog</title>
+    <link>https://tangcong.github.io/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on TangCong Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 02 Mar 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://tangcong.github.io/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>kubernetes best practices</title>
+      <link>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</link>
+      <pubDate>Sat, 02 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</guid>
+      <description>背景 2013年docker横空出世，正如其口号build,ship,run,其创新地提出将程序运行环境依赖打包为镜像,解决程序部署环境依赖、</description>
+    </item>
+    
+    <item>
+      <title>k8s-proxy how to work</title>
+      <link>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</link>
+      <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</guid>
+      <description>iptables iptable interface iptables-save iptables-restore ipset-interface util exec interface ipvs ipvs interface dbus</description>
+    </item>
+    
+  </channel>
+</rss>

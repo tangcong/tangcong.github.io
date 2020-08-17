@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://tangcong.github.io//img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io//img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="redis/codis troubleshooting总结" />
+    <meta property="og:title" content="redis/codis troubleshooting总结" />
+    <meta property="twitter:title" content="redis/codis troubleshooting总结" />
+    
+
+    
+    <meta name="description" content="redis,codis,aof,replication,rdb,client,troubleshooting">
+    <meta property="og:description" content="redis,codis,aof,replication,rdb,client,troubleshooting" />
+    <meta property="twitter:description" content="redis,codis,aof,replication,rdb,client,troubleshooting" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>redis/codis troubleshooting总结-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/post/2018-04-02-redis-codis-troubleshooting/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                    </div>
+                    <h1>redis/codis troubleshooting总结</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Monday, April 2, 2018
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#redis主备同步失败">redis主备同步失败</a></li>
+        <li><a href="#redis-port迁移数据失败">redis-port迁移数据失败</a></li>
+        <li><a href="#redis内存碎片">redis内存碎片</a></li>
+        <li><a href="#codis-dashboard无法踢掉故障proxy">codis dashboard无法踢掉故障proxy</a></li>
+        <li><a href="#codis-proxy故障处理">codis proxy故障处理</a></li>
+        <li><a href="#codis-dashboard故障处理">codis dashboard故障处理</a></li>
+        <li><a href="#redis故障处理">redis故障处理</a></li>
+        <li><a href="#redis性能异常排查">redis性能异常排查</a></li>
+        <li><a href="#codis数据迁移">codis数据迁移</a></li>
+        <li><a href="#codis数据倾斜">codis数据倾斜</a></li>
+        <li><a href="#redis主备数据不一致">redis主备数据不一致</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <h2 id="redis主备同步失败">redis主备同步失败</h2>
+<p>线上某两实例重新建立主备关系时,出现如下错误</p>
+<pre><code>23203:S 02 Apr 14:27:53.148 * MASTER &lt;-&gt; SLAVE sync started
+23203:S 02 Apr 14:27:53.148 * Non blocking connect for SYNC fired the event.
+23203:S 02 Apr 14:27:53.148 * Master replied to PING, replication can continue...
+23203:S 02 Apr 14:27:53.148 * Partial resynchronization not possible (no cached master)
+23203:S 02 Apr 14:27:53.514 * Full resync from master: 6f4bf5d4394cdbb3fe9a2b7d9d5b0243595c2975:1189450456093
+23203:S 02 Apr 14:31:15.072 * MASTER &lt;-&gt; SLAVE sync: receiving 6312956914 bytes from master
+23203:S 02 Apr 14:31:36.156 # I/O error trying to sync with MASTER: connection lost
+23203:S 02 Apr 14:31:36.786 * Connecting to MASTER x.y.z.z:6379
+23203:S 02 Apr 14:31:36.786 * MASTER &lt;-&gt; SLAVE sync started
+</code></pre><p>一般出现主备同步失败原因是以下参数设置不当.</p>
+<h3 id="repl-backlog-size">repl-backlog-size</h3>
+<p>Set the replication backlog size. The backlog is a buffer that accumulates
+slave data when slaves are disconnected for some time, so that when a slave
+wants to reconnect again, often a full resync is not needed, but a partial
+resync is enough, just passing the portion of data the slave missed while
+disconnected.</p>
+<p>The bigger the replication backlog, the longer the time the slave can be
+disconnected and later be able to perform a partial resynchronization.
+The backlog is only allocated once there is at least a slave connected.</p>
+<pre><code>repl-backlog-size 1mb
+</code></pre><p>默认较小，可根据实际情况适当增大.</p>
+<h3 id="client-output-buffer-limit">client-output-buffer-limit</h3>
+<p>The client output buffer limits can be used to force disconnection of clients
+that are not reading data from the server fast enough for some reason (a
+common reason is that a Pub/Sub client can&rsquo;t consume messages as fast as the
+publisher can produce them).</p>
+<p>The limit can be set differently for the three different classes of clients:</p>
+<pre><code>normal -&gt; normal clients including MONITOR clients
+slave  -&gt; slave clients
+pubsub -&gt; clients subscribed to at least one pubsub channel or pattern
+</code></pre><p>The syntax of every client-output-buffer-limit directive is the following:</p>
+<pre><code>client-output-buffer-limit &lt;class&gt; &lt;hard limit&gt; &lt;soft limit&gt; &lt;soft seconds&gt;
+</code></pre><p>A client is immediately disconnected once the hard limit is reached, or if
+the soft limit is reached and remains reached for the specified number of
+the limit for 10 seconds.</p>
+<p>Both the hard or the soft limit can be disabled by setting them to zero.</p>
+<pre><code>client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit slave 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+</code></pre><p>默认较小，可根据实际情况适当增大.</p>
+<p><a href="https://github.com/CodisLabs/codis/issues/185">ISSUE</a></p>
+<h2 id="redis-port迁移数据失败">redis-port迁移数据失败</h2>
+<p><a href="https://github.com/CodisLabs/codis/issues/318">ISSUE</a></p>
+<h2 id="redis内存碎片">redis内存碎片</h2>
+<h2 id="codis-dashboard无法踢掉故障proxy">codis dashboard无法踢掉故障proxy</h2>
+<h2 id="codis-proxy故障处理">codis proxy故障处理</h2>
+<h2 id="codis-dashboard故障处理">codis dashboard故障处理</h2>
+<h2 id="redis故障处理">redis故障处理</h2>
+<h2 id="redis性能异常排查">redis性能异常排查</h2>
+<h3 id="slowlog">slowlog</h3>
+<p>hgetall等慢查询操作导致业务毛刺等.</p>
+<h3 id="bigkeys">bigkeys</h3>
+<p>大key读写访问导致毛刺</p>
+<h3 id="disk-io">disk io</h3>
+<p>主备同步或数据备份时磁盘IO上升,影响业务.</p>
+<h3 id="swap">swap</h3>
+<p>业务反馈凌晨期间成功率较低.</p>
+<h2 id="codis数据迁移">codis数据迁移</h2>
+<h2 id="codis数据倾斜">codis数据倾斜</h2>
+<h3 id="大key导致数据倾斜">大key导致数据倾斜</h3>
+<h3 id="crc32算法分布不均">crc32算法分布不均</h3>
+<h2 id="redis主备数据不一致">redis主备数据不一致</h2>
+<p>redis重新建立主备关系后，发现主备KEY数量不一致.</p>
+<p><img src="/img/redis_inconsistency.jpg" alt="redis主备key数量不一致"></p>
+<p>redis使用的lru算法是lazy随机式淘汰，而主备同步后，加载RDB文件时，会检查过期时间，过期时间小于当前时间会清除.</p>
+<pre><code>        /* Check if the key already expired. This function is used when loading
+         * an RDB file from disk, either at startup, or when an RDB was
+         * received from the master. In the latter case, the master is
+         * responsible for key expiry. If we would expire keys here, the
+         * snapshot taken by the master may not be reflected on the slave. */
+        if (server.masterhost == NULL &amp;&amp; expiretime != -1 &amp;&amp; expiretime &lt; now) {
+            decrRefCount(key);
+            decrRefCount(val);
+        } else {
+            /* Add the new object in the hash table */
+            dbAdd(db,key,val);
+
+            /* Set the expire time if needed */
+            if (expiretime != -1) setExpire(NULL,db,key,expiretime);
+            if (lfu_freq != -1) {
+                val-&gt;lru = (LFUGetTimeInMinutes()&lt;&lt;8) | lfu_freq;
+            } else {
+                /* LRU idle time loaded from RDB is in seconds. Scale
+                 * according to the LRU clock resolution this Redis
+                 * instance was compiled with (normaly 1000 ms, so the
+</code></pre>
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2018-03-21-provision-ubuntu-server/" data-toggle="tooltip" data-placement="top" title="基于Ubuntu配置高效的开发环境">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/post/2019-01-12-iptables-how-to-work/" data-toggle="tooltip" data-placement="top" title="iptables how to work">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>
