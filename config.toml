@@ -1,4 +1,4 @@
-baseurl = "https://tangcong.github.io/"
+baseurl = "tangcong.github.io/"
 title = "TangCong Blog"
 theme = "hugo-theme-cleanwhite"
 languageCode = "en-us"
@@ -16,7 +16,7 @@ home = ["HTML", "RSS", "Algolia"]
   header_image = "img/home-bg-jeep.jpg"
   SEOTitle = "唐聪的博客 | TangCong Blog"
   description = "tangcong, etcd活跃贡献者, 开源爱好者 | 这里是 唐聪 的博客，与你一起发现更大的世界。"
-  keyword = "唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice"
+  keyword = "唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice"
   slogan = "面朝大海,春暖花开"
 
   image_404 = "img/404-bg.jpg"
