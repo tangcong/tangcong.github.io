@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="tangcong.github.io//img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="tangcong.github.io//img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="基于Ubuntu配置高效的开发环境" />
+    <meta property="og:title" content="基于Ubuntu配置高效的开发环境" />
+    <meta property="twitter:title" content="基于Ubuntu配置高效的开发环境" />
+    
+
+    
+    <meta name="description" content="ubuntu,apt-get,systemctl,git,vim,go">
+    <meta property="og:description" content="ubuntu,apt-get,systemctl,git,vim,go" />
+    <meta property="twitter:description" content="ubuntu,apt-get,systemctl,git,vim,go" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/tangcong.github.io/img/favicon.ico">
+
+    <title>基于Ubuntu配置高效的开发环境-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/tangcong.github.io/post/2018-03-21-provision-ubuntu-server/">
+
+    <link rel="stylesheet" href="/tangcong.github.io/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/tangcong.github.io/js/jquery.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/tangcong.github.io/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/tangcong.github.io/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/tangcong.github.io/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/tangcong.github.io/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/tangcong.github.io/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/tangcong.github.io/search">SEARCH <img src="/tangcong.github.io/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/tangcong.github.io/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tangcong.github.io/tags/ubuntu" title="ubuntu">
+                            ubuntu
+                        </a>
+                        
+                    </div>
+                    <h1>基于Ubuntu配置高效的开发环境</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Wednesday, March 21, 2018
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#配置软件镜像源">配置软件镜像源</a></li>
+        <li><a href="#linux平台软件包管理">linux平台软件包管理</a></li>
+        <li><a href="#linux平台启动管理">linux平台启动管理</a></li>
+        <li><a href="#linux平台日志服务">linux平台日志服务</a></li>
+        <li><a href="#时间配置">时间配置</a></li>
+        <li><a href="#network">Network</a></li>
+        <li><a href="#安装常用软件gogitvim">安装常用软件(GO/GIT/VIM)</a></li>
+        <li><a href="#配置vim插件">配置VIM插件</a></li>
+        <li><a href="#vim常用插件">VIM常用插件</a></li>
+        <li><a href="#go环境配置">GO环境配置</a></li>
+        <li><a href="#配置openssh-server">配置OpenSSh-Server</a></li>
+        <li><a href="#markdown环境配置">MarkDown环境配置</a></li>
+        <li><a href="#cc环境配置">C/C++环境配置</a></li>
+        <li><a href="#构建开发镜像">构建开发镜像</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <h2 id="配置软件镜像源">配置软件镜像源</h2>
+<p>不同的ubuntu版本应选择对应的镜像源,避免安装软件时出现依赖冲突等.
+推荐使用清华大学的<a href="https://mirror.tuna.tsinghua.edu.cn/help/ubuntu/">镜像源</a></p>
+<h2 id="linux平台软件包管理">linux平台软件包管理</h2>
+<p>linux平台上的<a href="https://www.ibm.com/developerworks/cn/linux/l-cn-rpmdpkg/">软件包管理</a></p>
+<h3 id="apt-getdeb">apt-get/deb</h3>
+<h3 id="yumrpm">yum/rpm</h3>
+<h2 id="linux平台启动管理">linux平台启动管理</h2>
+<p>linux平台上的<a href="https://coolshell.cn/articles/17998.html">启动管理</a>演化史</p>
+<h3 id="sysv-init">sysv init</h3>
+<h3 id="upstart">upstart</h3>
+<h3 id="systemd">systemd</h3>
+<h2 id="linux平台日志服务">linux平台日志服务</h2>
+<h3 id="journalctl">journalctl</h3>
+<h2 id="时间配置">时间配置</h2>
+<h3 id="ntpd">ntpd</h3>
+<h3 id="ntpstat">ntpstat</h3>
+<h3 id="tzselect">tzselect</h3>
+<h3 id="timedatectl">timedatectl</h3>
+<h3 id="配置文件">配置文件</h3>
+<pre><code>tz=Asia/Shanghai
+sudo cp -vf /usr/share/zoneinfo/$tz /etc/localtime
+echo $tz | sudo tee /etc/timezone
+</code></pre><h2 id="network">Network</h2>
+<h3 id="vmware网络模式">VMWARE网络模式</h3>
+<h4 id="bridge">Bridge</h4>
+<h4 id="nat">NAT</h4>
+<h4 id="host-only">Host-Only</h4>
+<h3 id="ubuntu-network-configure">Ubuntu Network Configure</h3>
+<pre><code>/etc/network/interfaces
+/etc/resolv.conf
+</code></pre><h4 id="auto-dhcp">auto-dhcp</h4>
+<h4 id="static-ip">static ip</h4>
+<h4 id="netmaskgateway">netmask/gateway</h4>
+<h4 id="dns">dns</h4>
+<h3 id="network-command">Network Command</h3>
+<h4 id="ip-addr">ip addr</h4>
+<h4 id="dig">dig</h4>
+<h4 id="ifdownifup">ifdown/ifup</h4>
+<h4 id="ifconfig">ifconfig</h4>
+<h4 id="telnet">telnet</h4>
+<h4 id="nslookup">nslookup</h4>
+<h4 id="netstat">netstat</h4>
+<h4 id="nmap">nmap</h4>
+<h3 id="httphttps代理配置">HTTP/HTTPS代理配置</h3>
+<p>在.bashrc文件里面增加以下配置.</p>
+<pre><code>export http_proxy=&quot;xx.yy.com:port&quot;
+export https_proxy=&quot;xx.yy.com:port&quot;
+</code></pre><h4 id="apt配置">APT配置</h4>
+<p>在/etc/apt/apt.conf.d路径增加以下文件及内容.</p>
+<pre><code>/etc/apt/apt.conf.d/01proxy
+Acquire::http { Proxy &quot;http://xx.yy.com:port&quot;;}
+</code></pre><h2 id="安装常用软件gogitvim">安装常用软件(GO/GIT/VIM)</h2>
+<h3 id="go">GO</h3>
+<p>下载最新的stable版本<a href="https://golang.org/dl/">GO</a>,解压<a href="https://golang.org/doc/install?download=go1.10.linux-amd64.tar.gz">安装</a>即可
+如安装了低版本的GO,先删除之</p>
+<pre><code>	sudo apt-get purge golang-go
+</code></pre><h3 id="git">GIT</h3>
+<h3 id="vim">VIM</h3>
+<h2 id="配置vim插件">配置VIM插件</h2>
+<p>常见的VIM插件管理方法</p>
+<h3 id="manual-installation">Manual Installation</h3>
+<h3 id="vundle">Vundle</h3>
+<h3 id="vim-plug">vim-plug</h3>
+<h3 id="pathogen">pathogen</h3>
+<h2 id="vim常用插件">VIM常用插件</h2>
+<h3 id="avim">a.vim</h3>
+<h3 id="nerdtree">nerdtree</h3>
+<h3 id="tagbarvim">tagbar.vim</h3>
+<h3 id="taglistvim">taglist.vim</h3>
+<h3 id="vim-easy-align">vim-easy-align</h3>
+<h2 id="go环境配置">GO环境配置</h2>
+<h3 id="vim-go">vim-go</h3>
+<h3 id="guru">guru</h3>
+<h4 id="goimplements">GoImplements</h4>
+<h4 id="gocallees">GoCallees</h4>
+<h4 id="gocallers">GoCallers</h4>
+<h4 id="goreferrers">GoReferrers</h4>
+<h3 id="gocode">gocode</h3>
+<h4 id="将gopathbin目录加入到path路径gocode基本原理是clientserver模式">将GOPATH/bin目录加入到$PATH路径,gocode基本原理是client/server模式</h4>
+<h4 id="通过ltc-xgtltc-ogt开启自动提示">通过&lt;C-x&gt;&lt;C-o&gt;开启自动提示</h4>
+<h2 id="配置openssh-server">配置OpenSSh-Server</h2>
+<h2 id="markdown环境配置">MarkDown环境配置</h2>
+<h3 id="vim-markdownhttpsgithubcomplasticboyvim-markdown"><a href="https://github.com/plasticboy/vim-markdown">vim-markdown</a></h3>
+<p>Syntax highlighting, matching rules and mappings for the original Markdown and extensions.</p>
+<pre><code>Plugin 'godlygeek/tabular'
+Plugin 'plasticboy/vim-markdown'
+</code></pre>
+<h3 id="vim-markdown-previewhttpsgithubcomjamshedvesunavim-markdown-preview"><a href="https://github.com/JamshedVesuna/vim-markdown-preview">vim-markdown-preview</a></h3>
+<p>A small Vim plugin for previewing markdown files in a browser.</p>
+<pre><code>Plugin 'JamshedVesuna/vim-markdown-preview'.
+</code></pre>
+<h3 id="griphttpsgithubcomjoeyespogrip"><a href="https://github.com/joeyespo/grip">grip</a></h3>
+<p>Render local readme files before sending off to GitHub.</p>
+<pre><code>    pip install grip
+    grip test.md 0.0.0.0
+</code></pre><h3 id="github-flavored-markdownhttpsguidesgithubcomfeaturesmastering-markdown"><a href="https://guides.github.com/features/mastering-markdown/">GitHub Flavored Markdown</a></h3>
+<p>GitHub.com uses its own version of the Markdown syntax that provides an additional set of useful features, many of which make it easier to work with content on GitHub.com.</p>
+<h2 id="cc环境配置">C/C++环境配置</h2>
+<h3 id="exuberant-ctagshttpctagssourceforgenet"><a href="http://ctags.sourceforge.net/">Exuberant Ctags</a></h3>
+<p>Exuberant Ctags is the latest incarnation of a [family of computer programs] ctags that scan source code files to create an index of identifiers (tags) and where they are defined. Vim uses this index (a so-called tags file) to enable you to jump to the definition of any identifier using the [Control-]] ctrl_mapping mapping.</p>
+<h3 id="vim-easytagshttpsgithubcomxoloxvim-easytags"><a href="https://github.com/xolox/vim-easytags">vim-easytags</a></h3>
+<p>Automated tag file generation and syntax highlighting of tags in Vim.</p>
+<h3 id="youcompletemehttpsgithubcomvalloricyoucompleteme"><a href="https://github.com/Valloric/YouCompleteMe">YouCompleteMe</a></h3>
+<p>YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for Vim.
+a Clang-based engine that provides native semantic code completion for C/C++/Objective-C/Objective-C++ (from now on referred to as &ldquo;the C-family languages&rdquo;).</p>
+<h3 id="clang_completehttpsgithubcomrip-ripclang_complete"><a href="https://github.com/Rip-Rip/clang_complete">clang_complete</a></h3>
+<p>Vim plugin that use clang for completing C/C++ code.
+You don&rsquo;t need any ctags for it to work! Only clang is needed. Clang version 2.8 or higher is recommended for c++ completion. After a . , -&gt; and :: it is automatically trying to complete the code. :smile:</p>
+<h3 id="omnicppcompletehttpsgithubcomvim-scriptsomnicppcomplete"><a href="https://github.com/vim-scripts/OmniCppComplete">OmniCppComplete</a></h3>
+<p>C/C++ omni-completion with ctags database. :broken_heart:</p>
+<h3 id="llvmhttpsllvmorg"><a href="https://llvm.org/">llvm</a></h3>
+<p>The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.</p>
+<ul>
+<li>LLVM Core.</li>
+<li>Clang.</li>
+<li>LLDB.</li>
+<li>libc++.</li>
+<li>compiler-rt.</li>
+<li>lld.</li>
+</ul>
+<p>The LLVM Core libraries provide a modern source- and target-independent optimizer, along with code generation support for many popular CPUs (as well as some less common ones!) These libraries are built around a well specified code representation known as the LLVM intermediate representation (&ldquo;LLVM IR&rdquo;). The LLVM Core libraries are well documented, and it is particularly easy to invent your own language (or port an existing compiler) to use LLVM as an optimizer and code generator.</p>
+<h3 id="clanghttpsclangllvmorg"><a href="https://clang.llvm.org/">clang</a></h3>
+<p>Clang is an &ldquo;LLVM native&rdquo; C/C++/Objective-C compiler, which aims to deliver amazingly fast compiles (e.g. about 3x faster than GCC when compiling Objective-C code in a debug configuration), extremely useful error and warning messages and to provide a platform for building great source level tools. The Clang Static Analyzer is a tool that automatically finds bugs in your code, and is a great example of the sort of tool that can be built using the Clang frontend as a library to parse C/C++ code.</p>
+<ul>
+<li>Fast compiles and low memory use</li>
+<li>Expressive diagnostics</li>
+<li>GCC compatibility</li>
+</ul>
+<h2 id="构建开发镜像">构建开发镜像</h2>
+<h3 id="dockerfile">Dockerfile</h3>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/" data-toggle="tooltip" data-placement="top" title="LRU算法常见实现方法解析">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/" data-toggle="tooltip" data-placement="top" title="redis/codis troubleshooting总结">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

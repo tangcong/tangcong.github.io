@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="tangcong.github.io//img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="tangcong.github.io//img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="升级集群导致ETCD数据不一致分析" />
+    <meta property="og:title" content="升级集群导致ETCD数据不一致分析" />
+    <meta property="twitter:title" content="升级集群导致ETCD数据不一致分析" />
+    
+
+    
+    <meta name="description" content="etcd,raft,boltdb,data inconsistency">
+    <meta property="og:description" content="etcd,raft,boltdb,data inconsistency" />
+    <meta property="twitter:description" content="etcd,raft,boltdb,data inconsistency" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/tangcong.github.io/img/favicon.ico">
+
+    <title>升级集群导致ETCD数据不一致分析-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/">
+
+    <link rel="stylesheet" href="/tangcong.github.io/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/tangcong.github.io/js/jquery.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/tangcong.github.io/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/tangcong.github.io/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/tangcong.github.io/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/tangcong.github.io/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/tangcong.github.io/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/tangcong.github.io/search">SEARCH <img src="/tangcong.github.io/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/tangcong.github.io/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tangcong.github.io/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                    </div>
+                    <h1>升级集群导致ETCD数据不一致分析</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Sunday, April 19, 2020
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#升级集群导致etcd数据不一致毁坏案例分析">升级集群导致ETCD数据不一致/毁坏案例分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <p>​</p>
+<h2 id="升级集群导致etcd数据不一致毁坏案例分析">升级集群导致ETCD数据不一致/毁坏案例分析</h2>
+<h3 id="背景">背景</h3>
+<p>近期我们在测试环境升级ETCD集群（3.2升级到3.3)的时候，遇到了一些奇怪现象。当集群升级完后，收到了测试同学反馈集群出现各种BUG了：</p>
+<ul>
+<li>变更镜像不生效的</li>
+<li>pod不调度的</li>
+<li>服务RS变更Service异常的</li>
+<li>扩容不生效的</li>
+<li>其他各种诡异的现象等</li>
+</ul>
+<p>我们最开始怀疑K8S的controller-manager/scheduler/apiserver出bug了，一番调查后发现又是etcd出现严重问题了(恰好测试环境我们屏蔽了这个集群的告警，导致我们事后才知道),我们通过监控视图和日志观察到有如下异常：</p>
+<ul>
+<li>部分节点db size异常增长,各个节点大小不一样</li>
+<li>各节点revision不一致</li>
+<li>部分etcd节点compact异常，无compact相关日志</li>
+<li>各节点key数量不一致</li>
+</ul>
+<p>我们尝试看日志是否为什么部分Key在有些节点有，有些节点无, 但是因为etcd的日志实在少的可怜，缺少关键的错误日志，我们一无所获，陷入迷茫和困惑中. 同时在社区上也未能搜索到有效信息，同时我们通过比对db的鉴权版本号也排除了不是我们上一次发现的严重的BUG（<a href="https://github.com/etcd-io/etcd/issues/11651">https://github.com/etcd-io/etcd/issues/11651,</a><a href="https://github.com/etcd-io/etcd/pull/11652">https://github.com/etcd-io/etcd/pull/11652</a>)，于是只能修改etcd代码并尝试复现了。</p>
+<h3 id="复现">复现</h3>
+<p>首先我们采用尝试人工简单升级ETCD集群试试是否能复现，然并卵，未能复现，其实正如我们所预期一样，如果那么能复现社区早发现早解决了，不可能我们现在才遇到。</p>
+<p>如何才能成功复现一个严重的BUG? 首先我们有如下推测：</p>
+<ul>
+<li>跟版本升级可能有一定关联</li>
+<li>跟重启可能有一定关联（上一个严重BUG是重启触发）</li>
+<li>跟鉴权的版本号auth revision没任何关系(已通过比对各个节点db源数据排除)</li>
+<li>观测现网监控异常时间段有哪些接口调用</li>
+<li>可能需要一定的QPS触发</li>
+</ul>
+<p>我们采取以下方法及技术手段对推测进行了分析和落地：</p>
+<ul>
+<li>人工无法简单复现，我们采用混沌工程(chaos monkey)的方法来寻求自动化压测复现</li>
+<li>monkey压测版本是从3.2升级到3.3，每次升级一个节点，不停写入数据，然后重启，压测较长时间后再继续升级其他节点，因为升级后不可逆，不能回退</li>
+<li>比对3.2和3.3版本发现两个大的改动，一个是lessor,一个是txn, 因此我们分别对3.2和3.3版本，在所有lessor和txn操作的关键路径增加debug日志和异常情况下增加详细的错误日志</li>
+<li>chaos monkey增加kill和restart各个节点的机制，通过简单锁机制，保证每次只杀掉1个节点，确保当前集群永远可用</li>
+<li>chaos monkey去除鉴权相关操作</li>
+<li>根据现网监控，chaos monkey 增加txn/range/lessor/txn的各接口调用，尤其是lessor/txn QPS适当加大,lesase ttl过期时间随机生成</li>
+<li>根据测试环境的监控显示我们的QPS当时在3000左右，连接数10000左右，因此我们chaos monkey也增加对应的QPS和client来满足条件</li>
+<li>调度部分测试集群到压测集群，以最逼真模拟现网, 毕竟这是在k8s集群下使用下产生的</li>
+</ul>
+<p>当我们把chaos monkey程序按照以上分析结论优化完后，在两套集群上同时部署，令人振奋的是，没过多久，我们就收到了一致性差异告警，我们又成功复现了。</p>
+<h3 id="原理分析">原理分析</h3>
+<p>收到告警后，我们立刻采取了以下措施:</p>
+<ul>
+<li>停止chaos moneky</li>
+<li>停掉集群，避免产生大量日志干扰我们排查</li>
+<li>观测数据不一致详情，发现3.2的两个节点数据一致，与3.3数据不一致</li>
+<li>脚本快速分析出3.2与3.3差异的KEY</li>
+<li>在各个节点中查询这个KEY的日志</li>
+<li>经过搜寻，我们得到了以下关键日志</li>
+</ul>
+<p>node A(3.2+,Leader)</p>
+<pre><code>
+637802:Mar 11 21:52:23 localhost etcd[28065]: LeaseRevoke:{LeaseRevoke 24 0  ID:2229124347589447546 } {entry-index 17 25  &lt;nil&gt;} {entry-term 17 2  &lt;nil&gt;} {rev 11 2014102077  &lt;nil&gt;}
+
+637803:Mar 11 21:52:23 localhost etcd[28065]: revoke lessor,lessor id:2229124347589447546
+
+637804:Mar 11 21:52:23 localhost etcd[28065]: revoke lessor,lessor id:2229124347589447546,key:/masterleases/A
+
+637805:Mar 11 21:52:23 localhost etcd[28065]: apply request:header:&lt;ID:16363671783383239993 &gt; lease\_revoke:&lt;ID:2229124347589447546 &gt; ,response:&amp;{0xc000d545e0 &lt;nil&gt; &lt;nil&gt;}
+
+</code></pre><p>node B(3.2+,Follower)</p>
+<pre><code>
+637802:Mar 11 21:52:23 localhost etcd[28065]: LeaseRevoke:{LeaseRevoke 24 0  ID:2229124347589447546 } {entry-index 17 25  &lt;nil&gt;} {entry-term 17 2  &lt;nil&gt;} {rev 11 2014102077  &lt;nil&gt;}
+
+637803:Mar 11 21:52:23 localhost etcd[28065]: revoke lessor,lessor id:2229124347589447546
+
+637804:Mar 11 21:52:23 localhost etcd[28065]: revoke lessor,lessor id:2229124347589447546,key:/masterleases/A
+
+637805:Mar 11 21:52:23 localhost etcd[28065]: apply request:header:&lt;ID:16363671783383239993 &gt; lease\_revoke:&lt;ID:2229124347589447546 &gt; ,response:&amp;{0xc000d545e0 &lt;nil&gt; &lt;nil&gt;}
+
+</code></pre><p>node C(3.3+,Follower)</p>
+<pre><code>
+1392010:Mar 11 21:56:42 localhost etcd[26312]: applyEntryNormal:check index, entry-index: 25, consistent-index: 24
+
+1392011:Mar 11 21:56:42 localhost etcd[26312]: shouldApplyV3, entry-index: 25,  consistent-index: 25
+
+1392012:Mar 11 21:56:42 localhost etcd[26312]: LeaseRevoke: ID:2229124347589447546 , entry-index: 25, entry-term: 2, rev: 2014102070
+
+1392014:Mar 11 21:56:42 localhost etcd[26312]: request &quot;header:&lt;ID:16363671783383239993 &gt; lease\_revoke:&lt;id:1eef70c8a23e4f7a&gt;&quot; with result &quot;error:auth: user name is empty&quot; took too long (1.464µs) to execute
+
+</code></pre><p>从日志中我们可以看到节点C(3.3+)执行lease_revoke命令时失败了,错误是用户名为空。 此错误将继续放大，从而导致mvcc版本差异很大，进而可能无法执行txn命令，并且数据损坏。</p>
+<h3 id="bug如何产生的">BUG如何产生的</h3>
+<p>为什么3.3节点执行会报user name is empty呢? 我突然想起之前比对3.2和3.3差异的时候，偶然看到了一处与其相关改动点，当时没意识到有什么问题，我立刻再去对比差异，发现正是这个PR（<a href="https://github.com/etcd-io/etcd/pull/8031">https://github.com/etcd-io/etcd/pull/8031</a>)在3.3的变动，导致3.3节点执行失败，在3.3以前lease revoke不需要鉴权，但是3.3这个PR增加了鉴权，导致lease过期的时候，3.3节点无法删除lease对应的key,进而出现数据不一致，版本差异，数据毁坏等一系列BUG。</p>
+<p>详情参考issue: <a href="https://github.com/etcd-io/etcd/issues/11689">https://github.com/etcd-io/etcd/issues/11689</a></p>
+<h3 id="修复方案">修复方案</h3>
+<p>我们讨论的修复方案有两种：</p>
+<ul>
+<li>3.3以上版本，在当集群中出现不一致的版本时，兼容这种低版本的没鉴权，跳过lease revoke的鉴权流程</li>
+<li>3.2版本确保lease revoke的时候auth info 不为空，用户想升级集群的时候先升级到3.2包含这个修复方案的最新版本，再继续升级到3.3版本，我们给社区提的PR也是这个方案</li>
+<li>详情参考PR： <a href="https://github.com/etcd-io/etcd/pull/11691">https://github.com/etcd-io/etcd/pull/11691</a></li>
+</ul>
+<h3 id="最佳实践">最佳实践</h3>
+<p>在成功发现和修复两个严重数据不一致BUG后，我们推荐以下ETCD最佳实践方案：</p>
+<ul>
+<li>ETCD定期备份数据，推荐是至少是10分钟级别，可以使用开源的etcd-operator中的backup-operator</li>
+<li>任何重要变更前一定备份数据</li>
+<li>为ETCD添加自动化的一致性巡检告警，如revision差异监控、key数量差异监控</li>
+<li>多关注社区issue/pr,及时升级到最新稳定版本</li>
+<li>使用etcd 最新版本的3.4.4用户，推荐开启data corruption检测功能，当集群出现不一致时，拒绝集群写入，可读</li>
+<li>确保集群中各节点ETCD版本一致</li>
+</ul>
+<p>最后关于ETCD数据不一致定位老大难的问题，我们也提交了PR，<a href="https://github.com/etcd-io/etcd/pull/11670">https://github.com/etcd-io/etcd/pull/11670</a>，相信以后定位不一致问题会方便很多，目前已经合入master。</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/" data-toggle="tooltip" data-placement="top" title="etcd数据不一致bug分析汇总">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/" data-toggle="tooltip" data-placement="top" title="重启etcd可能导致数据不一致BUG分析">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

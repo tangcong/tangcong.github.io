@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="tangcong.github.io//img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="tangcong.github.io//img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="深入理解zookeeper(实践总结篇)" />
+    <meta property="og:title" content="深入理解zookeeper(实践总结篇)" />
+    <meta property="twitter:title" content="深入理解zookeeper(实践总结篇)" />
+    
+
+    
+    <meta name="description" content="基于zookeeper实现配置系统,分布式锁，名称服务，性能优化，监控及troubleshooting">
+    <meta property="og:description" content="基于zookeeper实现配置系统,分布式锁，名称服务，性能优化，监控及troubleshooting" />
+    <meta property="twitter:description" content="基于zookeeper实现配置系统,分布式锁，名称服务，性能优化，监控及troubleshooting" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/tangcong.github.io/img/favicon.ico">
+
+    <title>深入理解zookeeper(实践总结篇)-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/">
+
+    <link rel="stylesheet" href="/tangcong.github.io/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/tangcong.github.io/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/tangcong.github.io/js/jquery.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/tangcong.github.io/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/tangcong.github.io/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/tangcong.github.io/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/tangcong.github.io/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/tangcong.github.io/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/tangcong.github.io/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/tangcong.github.io/search">SEARCH <img src="/tangcong.github.io/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/tangcong.github.io/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tangcong.github.io/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                    </div>
+                    <h1>深入理解zookeeper(实践总结篇)</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Friday, October 7, 2016
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#配置系统">配置系统</a></li>
+        <li><a href="#分布式锁">分布式锁</a></li>
+        <li><a href="#名称服务">名称服务</a></li>
+        <li><a href="#zookeeper性能优化">zookeeper性能优化</a></li>
+        <li><a href="#zookeeper监控及troubleshooting">zookeeper监控及troubleshooting</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <h2 id="配置系统">配置系统</h2>
+<h2 id="分布式锁">分布式锁</h2>
+<h2 id="名称服务">名称服务</h2>
+<h2 id="zookeeper性能优化">zookeeper性能优化</h2>
+<h2 id="zookeeper监控及troubleshooting">zookeeper监控及troubleshooting</h2>
+<h3 id="troubleshootingzookeeper-c-api-bug">troubleshooting(zookeeper c api bug)</h3>
+<h3 id="问题背景">问题背景</h3>
+<p>我们团队主要开发语言是c++,因此使用的是zookeeper c api,并且基于c api封装了一个简单、易用的c++库，之前线上某业务服务使用一个老zookeeper c++库时，遇到一个诡异的BUG，业务服务运行了一段时间后,有一定的概率出现一直读取配置失败。</p>
+<h3 id="问题定位及分析">问题定位及分析</h3>
+<p>通过lsof、netstat发现根本原因是，业务读取配置异常时，业务服务与zookeeper cluster的连接丢失了且无法自动重连上zookeeper cluster，只有手动重启服务才能恢复。我们使用的这个zookeeper c++ 库已经两三年了? 为什么这个BUG到现在才发现呢? 对比此业务服务和其他服务，此业务服务使用场景不一样，是根据请求实时读取配置,跟我们之前其他服务的用法（只有重启时从zookeeper上读取一次配置)有所不同,所以这BUG到现在才发现。</p>
+<p>随后排查zookeeper c++库相关代码，未发现明显处理不妥的之处，每个请求都会通过zoo_state检查zhandle状态。
+首先看看zookeeper zhandle 有哪些状态(基于zookeeper 3.4.6版本)。</p>
+<pre><code>/* zookeeper state constants */
+#define EXPIRED_SESSION_STATE_DEF -112
+#define AUTH_FAILED_STATE_DEF -113
+#define CONNECTING_STATE_DEF 1
+#define ASSOCIATING_STATE_DEF 2
+#define CONNECTED_STATE_DEF 3
+#define NOTCONNECTED_STATE_DEF 999
+
+const int ZOO_EXPIRED_SESSION_STATE = EXPIRED_SESSION_STATE_DEF;
+const int ZOO_AUTH_FAILED_STATE = AUTH_FAILED_STATE_DEF;
+const int ZOO_CONNECTING_STATE = CONNECTING_STATE_DEF;
+const int ZOO_ASSOCIATING_STATE = ASSOCIATING_STATE_DEF;
+const int ZOO_CONNECTED_STATE = CONNECTED_STATE_DEF;
+</code></pre>
+<p>对于无效的状态如（ZOO_EXPIRED_SESSION_STATE）都有close zhandle句柄，重新初始化,但是线上竟然还有无法重连的问题，比较诡异。
+随后猜测是不是有其他状态漏处理了? 这个可通过出现异常的时候zhandle的状态是什么就可以判断是否有漏处理或者出现了其他非法状态，遗憾的是这c++库在核心关键的函数里面没有打印相关日志（日志的重要性不言而喻).</p>
+<h3 id="问题解决">问题解决</h3>
+<p>于是我们增加了日志，并且加强了处理逻辑，对于未知的状态也close zhandle,重建连接，发到线上后，bug重现后，通过日志确认的确是出现了未知
+的状态值0，同时因为我们修复版本对未知状态也进行了处理，所以线上问题也得以修复。
+从上面zookeeper c api定义的状态可知，0是没有定义的，通过搜索zookeeper c api源代码确认了给zhandle state赋值为0的代码处，通过google也搜索到了相关<a href="https://issues.apache.org/jira/browse/ZOOKEEPER-2519">ISSUE</a>.</p>
+<h2 id="总结">总结</h2>
+<h4 id="参考资料">参考资料</h4>
+<ul>
+<li><a href="https://zookeeper.apache.org/doc/r3.4.6/zookeeperOver.html">Apache Zookeeper</a></li>
+</ul>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/" data-toggle="tooltip" data-placement="top" title="深入理解zookeeper(工程实现篇)">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/" data-toggle="tooltip" data-placement="top" title="深入理解zookeeper(原理篇)">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tangcong.github.io/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>zookeeper on TangCong Blog</title>
+    <link>tangcong.github.io/tags/zookeeper/</link>
+    <description>Recent content in zookeeper on TangCong Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 08 Nov 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="tangcong.github.io/tags/zookeeper/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>深入理解zookeeper(原理篇)</title>
+      <link>tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</link>
+      <pubDate>Tue, 08 Nov 2016 00:00:00 +0000</pubDate>
+      
+      <guid>tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</guid>
+      <description>zab raft paxos 总结</description>
+    </item>
+    
+    <item>
+      <title>深入理解zookeeper(实践总结篇)</title>
+      <link>tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</link>
+      <pubDate>Fri, 07 Oct 2016 00:00:00 +0000</pubDate>
+      
+      <guid>tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</guid>
+      <description>配置系统 分布式锁 名称服务 zookeeper性能优化 zookeeper监控及troubleshooting troubleshooting(zookeeper c api bug) 问题背景 我们团队主要开发语言</description>
+    </item>
+    
+    <item>
+      <title>深入理解zookeeper(工程实现篇)</title>
+      <link>tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</link>
+      <pubDate>Sun, 18 Sep 2016 00:00:00 +0000</pubDate>
+      
+      <guid>tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</guid>
+      <description>zookeeper概况 背景&amp;amp;问题 在生产环境中，为了提高服务可用性、支撑更多的用户量等,分布式应用服务都会在不同IDC多个节点上部署，</description>
+    </item>
+    
+  </channel>
+</rss>
