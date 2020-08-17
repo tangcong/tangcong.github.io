@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LRU on TangCong Blog</title>
-    <link>https://tangcong.github.io/tags/lru/</link>
+    <link>tangcong.github.io/tags/lru/</link>
     <description>Recent content in LRU on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 10 May 2017 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://tangcong.github.io/tags/lru/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="tangcong.github.io/tags/lru/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>LRU算法常见实现方法解析</title>
-      <link>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</link>
+      <link>tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</link>
       <pubDate>Wed, 10 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</guid>
+      <guid>tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</guid>
       <description>LRU算法基本介绍 LRU算法标准实现 Leveldb LRU算法实现 Redis LRU算法实现 Linux Page Cache LRU算法实现</description>
     </item>
     

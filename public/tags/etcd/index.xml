@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>etcd on TangCong Blog</title>
-    <link>https://tangcong.github.io/tags/etcd/</link>
+    <link>tangcong.github.io/tags/etcd/</link>
     <description>Recent content in etcd on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 24 Apr 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://tangcong.github.io/tags/etcd/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="tangcong.github.io/tags/etcd/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>重启etcd可能导致数据不一致BUG分析</title>
-      <link>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</link>
+      <link>tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</link>
       <pubDate>Fri, 24 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</guid>
+      <guid>tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</guid>
       <description>​ 重启etcd可能导致数据不一致BUG分析 背景 近期我们遇到一个严重BUG，开启鉴权后，重启etcd就可能导致数据不一致，根本原因是鉴权相关操</description>
     </item>
     
     <item>
       <title>升级集群导致ETCD数据不一致分析</title>
-      <link>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</link>
+      <link>tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</link>
       <pubDate>Sun, 19 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</guid>
+      <guid>tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</guid>
       <description>​ 升级集群导致ETCD数据不一致/毁坏案例分析 背景 近期我们在测试环境升级ETCD集群（3.2升级到3.3)的时候，遇到了一些奇怪现象。当集群</description>
     </item>
     
     <item>
       <title>etcd数据不一致bug分析汇总</title>
-      <link>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</link>
+      <link>tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</link>
       <pubDate>Mon, 02 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</guid>
+      <guid>tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</guid>
       <description>etcd数据不一致bug案例分析 简单总结目前几个已知的etcd数据不一致案例,以及相关排查思路，后续持续更新。 mvcc: fix rev inconsistency 确保重启后重建的版本号</description>
     </item>
     

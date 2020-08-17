@@ -3,163 +3,163 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://tangcong.github.io/categories/</loc>
+    <loc>tangcong.github.io/categories/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/etcdkubernetes/</loc>
+    <loc>tangcong.github.io/tags/etcdkubernetes/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/</loc>
+    <loc>tangcong.github.io/post/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/</loc>
+    <loc>tangcong.github.io/tags/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/</loc>
+    <loc>tangcong.github.io/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/categories/tech/</loc>
+    <loc>tangcong.github.io/categories/tech/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</loc>
+    <loc>tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/etcd/</loc>
+    <loc>tangcong.github.io/tags/etcd/</loc>
     <lastmod>2020-04-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</loc>
+    <loc>tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</loc>
     <lastmod>2020-04-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</loc>
+    <loc>tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</loc>
     <lastmod>2020-04-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</loc>
+    <loc>tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</loc>
     <lastmod>2020-03-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/kubernetes/</loc>
+    <loc>tangcong.github.io/tags/kubernetes/</loc>
     <lastmod>2019-03-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</loc>
+    <loc>tangcong.github.io/post/2019-03-02-k8s-best-practices/</loc>
     <lastmod>2019-03-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</loc>
+    <loc>tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/iptables/</loc>
+    <loc>tangcong.github.io/tags/iptables/</loc>
     <lastmod>2019-01-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</loc>
+    <loc>tangcong.github.io/post/2019-01-12-iptables-how-to-work/</loc>
     <lastmod>2019-01-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/redis/</loc>
+    <loc>tangcong.github.io/tags/redis/</loc>
     <lastmod>2018-04-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</loc>
+    <loc>tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</loc>
     <lastmod>2018-04-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/ubuntu/</loc>
+    <loc>tangcong.github.io/tags/ubuntu/</loc>
     <lastmod>2018-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</loc>
+    <loc>tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</loc>
     <lastmod>2018-03-21T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/lru/</loc>
+    <loc>tangcong.github.io/tags/lru/</loc>
     <lastmod>2017-05-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</loc>
+    <loc>tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</loc>
     <lastmod>2017-05-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/zookeeper/</loc>
+    <loc>tangcong.github.io/tags/zookeeper/</loc>
     <lastmod>2016-11-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</loc>
+    <loc>tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</loc>
     <lastmod>2016-11-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</loc>
+    <loc>tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</loc>
     <lastmod>2016-10-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</loc>
+    <loc>tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</loc>
     <lastmod>2016-09-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/2016/09/11/hello-world/</loc>
+    <loc>tangcong.github.io/2016/09/11/hello-world/</loc>
     <lastmod>2016-09-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</loc>
+    <loc>tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</loc>
     <lastmod>2016-09-11T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/search/placeholder/</loc>
+    <loc>tangcong.github.io/search/placeholder/</loc>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/top/about/</loc>
+    <loc>tangcong.github.io/top/about/</loc>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/top/books/</loc>
+    <loc>tangcong.github.io/top/books/</loc>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/search/</loc>
+    <loc>tangcong.github.io/search/</loc>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/top/</loc>
+    <loc>tangcong.github.io/top/</loc>
   </url>
   
 </urlset>
