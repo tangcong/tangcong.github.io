@@ -2,147 +2,147 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on TangCong Blog</title>
-    <link>tangcong.github.io/post/</link>
+    <link>https://tangcong.github.io/post/</link>
     <description>Recent content in Posts on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 05 Jul 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="tangcong.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tangcong.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>万级k8s集群背后的etcd稳定性与性能优化实践</title>
-      <link>tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</link>
+      <link>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</link>
       <pubDate>Sun, 05 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</guid>
+      <guid>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</guid>
       <description>​ 万级k8s集群背后的etcd稳定性与性能优化实践 背景 本文介绍了TKE容器团队在万级k8s集群和内部其他业务场景下遇到的一系列etcd问题，</description>
     </item>
     
     <item>
       <title>重启etcd可能导致数据不一致BUG分析</title>
-      <link>tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</link>
+      <link>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</link>
       <pubDate>Fri, 24 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</guid>
+      <guid>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</guid>
       <description>​ 重启etcd可能导致数据不一致BUG分析 背景 近期我们遇到一个严重BUG，开启鉴权后，重启etcd就可能导致数据不一致，根本原因是鉴权相关操</description>
     </item>
     
     <item>
       <title>升级集群导致ETCD数据不一致分析</title>
-      <link>tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</link>
+      <link>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</link>
       <pubDate>Sun, 19 Apr 2020 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</guid>
+      <guid>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</guid>
       <description>​ 升级集群导致ETCD数据不一致/毁坏案例分析 背景 近期我们在测试环境升级ETCD集群（3.2升级到3.3)的时候，遇到了一些奇怪现象。当集群</description>
     </item>
     
     <item>
       <title>etcd数据不一致bug分析汇总</title>
-      <link>tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</link>
+      <link>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</link>
       <pubDate>Mon, 02 Mar 2020 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</guid>
+      <guid>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</guid>
       <description>etcd数据不一致bug案例分析 简单总结目前几个已知的etcd数据不一致案例,以及相关排查思路，后续持续更新。 mvcc: fix rev inconsistency 确保重启后重建的版本号</description>
     </item>
     
     <item>
       <title>kubernetes best practices</title>
-      <link>tangcong.github.io/post/2019-03-02-k8s-best-practices/</link>
+      <link>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</link>
       <pubDate>Sat, 02 Mar 2019 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2019-03-02-k8s-best-practices/</guid>
+      <guid>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</guid>
       <description>背景 2013年docker横空出世，正如其口号build,ship,run,其创新地提出将程序运行环境依赖打包为镜像,解决程序部署环境依赖、</description>
     </item>
     
     <item>
       <title>k8s-proxy how to work</title>
-      <link>tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</link>
+      <link>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</link>
       <pubDate>Sun, 13 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</guid>
+      <guid>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</guid>
       <description>iptables iptable interface iptables-save iptables-restore ipset-interface util exec interface ipvs ipvs interface dbus</description>
     </item>
     
     <item>
       <title>iptables how to work</title>
-      <link>tangcong.github.io/post/2019-01-12-iptables-how-to-work/</link>
+      <link>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</link>
       <pubDate>Sat, 12 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2019-01-12-iptables-how-to-work/</guid>
+      <guid>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</guid>
       <description>iptables介绍 iptables 初识 iptables 接口 iptables table iptables chain iptables iptables 内核实现之netfilter netfilter 介绍 netfilter is a set of hooks inside the Linux kernel that allows kernel modules to register callback functions with the network stack. A registered callback function is then called back for</description>
     </item>
     
     <item>
       <title>redis/codis troubleshooting总结</title>
-      <link>tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</link>
+      <link>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</guid>
+      <guid>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</guid>
       <description>redis主备同步失败 线上某两实例重新建立主备关系时,出现如下错误 23203:S 02 Apr 14:27:53.148 * MASTER &amp;lt;-&amp;gt; SLAVE sync started 23203:S 02 Apr 14:27:53.148 * Non blocking connect for SYNC fired the event. 23203:S 02 Apr 14:27:53.148 * Master replied to PING, replication can continue... 23203:S 02</description>
     </item>
     
     <item>
       <title>基于Ubuntu配置高效的开发环境</title>
-      <link>tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</link>
+      <link>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</link>
       <pubDate>Wed, 21 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</guid>
+      <guid>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</guid>
       <description>配置软件镜像源 不同的ubuntu版本应选择对应的镜像源,避免安装软件时出现依赖冲突等. 推荐使用清华大学的镜像源 linux平台软件包管理 lin</description>
     </item>
     
     <item>
       <title>LRU算法常见实现方法解析</title>
-      <link>tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</link>
+      <link>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</link>
       <pubDate>Wed, 10 May 2017 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</guid>
+      <guid>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</guid>
       <description>LRU算法基本介绍 LRU算法标准实现 Leveldb LRU算法实现 Redis LRU算法实现 Linux Page Cache LRU算法实现</description>
     </item>
     
     <item>
       <title>深入理解zookeeper(原理篇)</title>
-      <link>tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</link>
+      <link>https://tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</link>
       <pubDate>Tue, 08 Nov 2016 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</guid>
+      <guid>https://tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</guid>
       <description>zab raft paxos 总结</description>
     </item>
     
     <item>
       <title>深入理解zookeeper(实践总结篇)</title>
-      <link>tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</link>
+      <link>https://tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</link>
       <pubDate>Fri, 07 Oct 2016 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</guid>
+      <guid>https://tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</guid>
       <description>配置系统 分布式锁 名称服务 zookeeper性能优化 zookeeper监控及troubleshooting troubleshooting(zookeeper c api bug) 问题背景 我们团队主要开发语言</description>
     </item>
     
     <item>
       <title>深入理解zookeeper(工程实现篇)</title>
-      <link>tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</link>
+      <link>https://tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</link>
       <pubDate>Sun, 18 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</guid>
+      <guid>https://tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</guid>
       <description>zookeeper概况 背景&amp;amp;问题 在生产环境中，为了提高服务可用性、支撑更多的用户量等,分布式应用服务都会在不同IDC多个节点上部署，</description>
     </item>
     
     <item>
       <title>Welcome to TangCong Blog</title>
-      <link>tangcong.github.io/2016/09/11/hello-world/</link>
+      <link>https://tangcong.github.io/2016/09/11/hello-world/</link>
       <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/2016/09/11/hello-world/</guid>
+      <guid>https://tangcong.github.io/2016/09/11/hello-world/</guid>
       <description>“Yeah It&amp;rsquo;s on. ” Hello World!</description>
     </item>
     
     <item>
       <title>大规模排行榜系统实践及挑战</title>
-      <link>tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</link>
+      <link>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</link>
       <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</guid>
+      <guid>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</guid>
       <description>如何支持业务就近接入？低延时? 如何支撑数万乃至百万级排行榜申请? 如何降低机器成本？选择合适存储引擎？ 如何避免各业务资源抢占，相互影响？ 原文发</description>
     </item>
     

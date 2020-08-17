@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ubuntu on TangCong Blog</title>
-    <link>tangcong.github.io/tags/ubuntu/</link>
+    <link>https://tangcong.github.io/tags/ubuntu/</link>
     <description>Recent content in ubuntu on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 21 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="tangcong.github.io/tags/ubuntu/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tangcong.github.io/tags/ubuntu/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>基于Ubuntu配置高效的开发环境</title>
-      <link>tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</link>
+      <link>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</link>
       <pubDate>Wed, 21 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</guid>
+      <guid>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</guid>
       <description>配置软件镜像源 不同的ubuntu版本应选择对应的镜像源,避免安装软件时出现依赖冲突等. 推荐使用清华大学的镜像源 linux平台软件包管理 lin</description>
     </item>
     

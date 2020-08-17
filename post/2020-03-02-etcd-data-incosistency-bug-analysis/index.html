@@ -10,8 +10,8 @@
     <meta property="og:type" content="article">
 
     
-    <meta property="og:image" content="tangcong.github.io//img/home-bg-jeep.jpg">
-    <meta property="twitter:image" content="tangcong.github.io//img/home-bg-jeep.jpg" />
+    <meta property="og:image" content="https://tangcong.github.io/img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io/img/home-bg-jeep.jpg" />
     
 
     
@@ -31,23 +31,23 @@
     
     
 
-    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd,Kubernetes, knative, 微服务, Microservice">
-    <link rel="shortcut icon" href="/tangcong.github.io/img/favicon.ico">
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
 
     <title>etcd数据不一致bug分析汇总-唐聪的博客 | TangCong Blog</title>
 
-    <link rel="canonical" href="/tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/">
+    <link rel="canonical" href="/post/2020-03-02-etcd-data-incosistency-bug-analysis/">
 
-    <link rel="stylesheet" href="/tangcong.github.io/css/iDisqus.min.css"/>
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
     
-    <link rel="stylesheet" href="/tangcong.github.io/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 
     
-    <link rel="stylesheet" href="/tangcong.github.io/css/hux-blog.min.css">
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
 
     
-    <link rel="stylesheet" href="/tangcong.github.io/css/zanshang.css">
+    <link rel="stylesheet" href="/css/zanshang.css">
     
     
     <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -57,13 +57,13 @@
 
     
     
-    <script src="/tangcong.github.io/js/jquery.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
     
     
-    <script src="/tangcong.github.io/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
     
     
-    <script src="/tangcong.github.io/js/hux-blog.min.js"></script>
+    <script src="/js/hux-blog.min.js"></script>
 
     
     
@@ -82,7 +82,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/tangcong.github.io/">TangCong Blog</a>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
         </div>
 
         
@@ -91,25 +91,25 @@
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="/tangcong.github.io/">Home</a>
+                        <a href="/">Home</a>
                     </li>
                     
                         
                         <li>
-                            <a href="/tangcong.github.io/categories/tech">tech</a>
+                            <a href="/categories/tech">tech</a>
                         </li>
                         
                     
                     
 		    
-                        <li><a href="/tangcong.github.io/top/books/">BOOKS</a></li>
+                        <li><a href="/top/books/">BOOKS</a></li>
                     
-                        <li><a href="/tangcong.github.io/top/about/">ABOUT</a></li>
+                        <li><a href="/top/about/">ABOUT</a></li>
                     
 
                     
 		    <li>
-                        <a href="/tangcong.github.io/search">SEARCH <img src="/tangcong.github.io/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
 		    </li>
                     
                 </ul>
@@ -153,7 +153,7 @@
 
 <style type="text/css">
     header.intro-header {
-        background-image: url('/tangcong.github.io/img/home-bg-jeep.jpg')
+        background-image: url('/img/home-bg-jeep.jpg')
     }
 </style>
 <header class="intro-header">
@@ -163,7 +163,7 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tangcong.github.io/tags/etcd" title="etcd">
+                        <a class="tag" href="/tags/etcd" title="etcd">
                             etcd
                         </a>
                         
@@ -236,13 +236,13 @@ lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的�
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="tangcong.github.io/post/2019-03-02-k8s-best-practices/" data-toggle="tooltip" data-placement="top" title="kubernetes best practices">&larr;
+                        <a href="/post/2019-03-02-k8s-best-practices/" data-toggle="tooltip" data-placement="top" title="kubernetes best practices">&larr;
                             Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/" data-toggle="tooltip" data-placement="top" title="升级集群导致ETCD数据不一致分析">Next
+                        <a href="/post/2020-04-19-etcd-upgrading-bug-analysis/" data-toggle="tooltip" data-placement="top" title="升级集群导致ETCD数据不一致分析">Next
                             Post &rarr;</a>
                     </li>
                     
@@ -269,7 +269,7 @@ lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的�
                         
                         
                         
-                        <a href="/tangcong.github.io/tags/etcd" title="etcd">
+                        <a href="/tags/etcd" title="etcd">
                             etcd
                         </a>
                         
@@ -279,7 +279,7 @@ lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的�
                         
                         
                         
-                        <a href="/tangcong.github.io/tags/kubernetes" title="kubernetes">
+                        <a href="/tags/kubernetes" title="kubernetes">
                             kubernetes
                         </a>
                         
@@ -287,7 +287,7 @@ lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的�
                         
                         
                         
-                        <a href="/tangcong.github.io/tags/redis" title="redis">
+                        <a href="/tags/redis" title="redis">
                             redis
                         </a>
                         
@@ -295,7 +295,7 @@ lease key过期操作增加了鉴权，而3.2没有，所以当leader是3.2的�
                         
                         
                         
-                        <a href="/tangcong.github.io/tags/zookeeper" title="zookeeper">
+                        <a href="/tags/zookeeper" title="zookeeper">
                             zookeeper
                         </a>
                         

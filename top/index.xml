@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tops on TangCong Blog</title>
-    <link>tangcong.github.io/top/</link>
+    <link>https://tangcong.github.io/top/</link>
     <description>Recent content in Tops on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="tangcong.github.io/top/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tangcong.github.io/top/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title></title>
-      <link>tangcong.github.io/top/about/</link>
+      <link>https://tangcong.github.io/top/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/top/about/</guid>
+      <guid>https://tangcong.github.io/top/about/</guid>
       <description>Tang Cong is an software developer.
 Feel free to connect TangCong via Github (https://github.com/tangcong) or drop him an email (tangcong506@gmail.com).
 Talks </description>
@@ -23,10 +23,10 @@ Talks </description>
     
     <item>
       <title></title>
-      <link>tangcong.github.io/top/books/</link>
+      <link>https://tangcong.github.io/top/books/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/top/books/</guid>
+      <guid>https://tangcong.github.io/top/books/</guid>
       <description>书籍</description>
     </item>
     

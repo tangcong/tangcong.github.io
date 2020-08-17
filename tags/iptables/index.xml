@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>iptables on TangCong Blog</title>
-    <link>tangcong.github.io/tags/iptables/</link>
+    <link>https://tangcong.github.io/tags/iptables/</link>
     <description>Recent content in iptables on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 12 Jan 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="tangcong.github.io/tags/iptables/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://tangcong.github.io/tags/iptables/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>iptables how to work</title>
-      <link>tangcong.github.io/post/2019-01-12-iptables-how-to-work/</link>
+      <link>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</link>
       <pubDate>Sat, 12 Jan 2019 00:00:00 +0000</pubDate>
       
-      <guid>tangcong.github.io/post/2019-01-12-iptables-how-to-work/</guid>
+      <guid>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</guid>
       <description>iptables介绍 iptables 初识 iptables 接口 iptables table iptables chain iptables iptables 内核实现之netfilter netfilter 介绍 netfilter is a set of hooks inside the Linux kernel that allows kernel modules to register callback functions with the network stack. A registered callback function is then called back for</description>
     </item>
     
