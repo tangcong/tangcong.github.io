@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="" />
-    <meta property="og:title" content="" />
-    <meta property="twitter:title" content="" />
+    <meta name="title" content="大规模codis 集群的治理与实践" />
+    <meta property="og:title" content="大规模codis 集群的治理与实践" />
+    <meta property="twitter:title" content="大规模codis 集群的治理与实践" />
     
 
     
-    <meta name="description" content="tangcong, etcd活跃贡献者, 开源爱好者 | 这里是 唐聪 的博客，与你一起发现更大的世界。">
-    <meta property="og:description" content="tangcong, etcd活跃贡献者, 开源爱好者 | 这里是 唐聪 的博客，与你一起发现更大的世界。" />
-    <meta property="twitter:description" content="tangcong, etcd活跃贡献者, 开源爱好者 | 这里是 唐聪 的博客，与你一起发现更大的世界。" />
+    <meta name="description" content="大规模codis集群治理经验">
+    <meta property="og:description" content="大规模codis集群治理经验" />
+    <meta property="twitter:description" content="大规模codis集群治理经验" />
     
 
     
@@ -34,9 +34,9 @@
     <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>Tops-唐聪的博客 | TangCong Blog</title>
+    <title>大规模codis 集群的治理与实践-唐聪的博客 | TangCong Blog</title>
 
-    <link rel="canonical" href="/top/">
+    <link rel="canonical" href="/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/">
 
     <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
@@ -150,14 +150,37 @@
 
 
 
-<header class="intro-header" style="background-image: url('/img/home-bg-jeep.jpg')">
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>TangCong Blog </h1>
-                    
-		    <span class="subheading">面朝大海,春暖花开</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                    </div>
+                    <h1>大规模codis 集群的治理与实践</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Wednesday, November 1, 2017
+                        
+                        
+                        
+                    </span>
                 </div>
             </div>
         </div>
@@ -170,13 +193,44 @@
 <article>
     <div class="container">
         <div class="row">
+
             
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-11 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 post-container">
 
-         	
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents"></nav>
+                
+                <p>为什么选型codis作为我们分布式缓存服务?</p>
+<p>我们是如何打造codis平台的?</p>
+<p>codis数据迁移流程和原理是怎样的？</p>
+<p>如何保证codis服务高可用的？</p>
+<p><a href="https://cloud.tencent.com/developer/article/1006262">原文</a>发表在腾讯云技术社区，欢迎阅读~</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2017-05-10-dive-into-the-lru-algorithm/" data-toggle="tooltip" data-placement="top" title="LRU算法常见实现方法解析">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/post/2018-04-02-redis-codis-troubleshooting/" data-toggle="tooltip" data-placement="top" title="redis/codis troubleshooting总结">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
                 
 <div id="disqus-comment"></div>
 
@@ -185,7 +239,7 @@
             </div>
             
             <div class="
-                col-lg-8 col-lg-offset-2
+                col-lg-11 col-lg-offset-1
                 col-md-10 col-md-offset-1
                 sidebar-container">
 
@@ -199,7 +253,7 @@
                         
                         
                         <a href="/tags/etcd" title="etcd">
-                        etcd
+                            etcd
                         </a>
                         
                         
@@ -209,7 +263,7 @@
                         
                         
                         <a href="/tags/kubernetes" title="kubernetes">
-                        kubernetes
+                            kubernetes
                         </a>
                         
                         
@@ -217,13 +271,13 @@
                         
                         
                         <a href="/tags/redis" title="redis">
-                        redis
+                            redis
                         </a>
                         
                         
                         
                         <a href="/tags/zookeeper" title="zookeeper">
-                        zookeeper
+                            zookeeper
                         </a>
                         
                         

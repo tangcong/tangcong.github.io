@@ -21,6 +21,15 @@
     </item>
     
     <item>
+      <title>大规模codis 集群的治理与实践</title>
+      <link>https://tangcong.github.io/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/</link>
+      <pubDate>Wed, 01 Nov 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/</guid>
+      <description>为什么选型codis作为我们分布式缓存服务? 我们是如何打造codis平台的? codis数据迁移流程和原理是怎样的？ 如何保证codis服务高可</description>
+    </item>
+    
+    <item>
       <title>大规模排行榜系统实践及挑战</title>
       <link>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</link>
       <pubDate>Sun, 11 Sep 2016 00:00:00 +0000</pubDate>

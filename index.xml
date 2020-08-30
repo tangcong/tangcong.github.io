@@ -84,12 +84,12 @@
     </item>
     
     <item>
-      <title>基于Ubuntu配置高效的开发环境</title>
-      <link>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</link>
-      <pubDate>Wed, 21 Mar 2018 00:00:00 +0000</pubDate>
+      <title>大规模codis 集群的治理与实践</title>
+      <link>https://tangcong.github.io/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/</link>
+      <pubDate>Wed, 01 Nov 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://tangcong.github.io/post/2018-03-21-provision-ubuntu-server/</guid>
-      <description>配置软件镜像源 不同的ubuntu版本应选择对应的镜像源,避免安装软件时出现依赖冲突等. 推荐使用清华大学的镜像源 linux平台软件包管理 lin</description>
+      <guid>https://tangcong.github.io/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/</guid>
+      <description>为什么选型codis作为我们分布式缓存服务? 我们是如何打造codis平台的? codis数据迁移流程和原理是怎样的？ 如何保证codis服务高可</description>
     </item>
     
     <item>
