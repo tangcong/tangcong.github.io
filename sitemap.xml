@@ -8,12 +8,17 @@
   </url>
   
   <url>
+    <loc>https://tangcong.github.io/tags/etcd/</loc>
+    <lastmod>2020-09-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://tangcong.github.io/post/2020-09-19-etcd-qos-proposal/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/etcdkubernetes/</loc>
+    <loc>https://tangcong.github.io/tags/kubernetes/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
   </url>
   
@@ -43,11 +48,6 @@
   </url>
   
   <url>
-    <loc>https://tangcong.github.io/tags/etcd/</loc>
-    <lastmod>2020-04-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</loc>
     <lastmod>2020-04-24T00:00:00+00:00</lastmod>
   </url>
@@ -60,11 +60,6 @@
   <url>
     <loc>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</loc>
     <lastmod>2020-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tangcong.github.io/tags/kubernetes/</loc>
-    <lastmod>2019-03-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>

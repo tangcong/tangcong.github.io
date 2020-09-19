@@ -12,18 +12,9 @@
     
     
     <item>
-      <title>etcd,kubernetes</title>
-      <link>https://tangcong.github.io/tags/etcdkubernetes/</link>
-      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://tangcong.github.io/tags/etcdkubernetes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>etcd</title>
       <link>https://tangcong.github.io/tags/etcd/</link>
-      <pubDate>Fri, 24 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>https://tangcong.github.io/tags/etcd/</guid>
       <description></description>
@@ -32,7 +23,7 @@
     <item>
       <title>kubernetes</title>
       <link>https://tangcong.github.io/tags/kubernetes/</link>
-      <pubDate>Sat, 02 Mar 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>https://tangcong.github.io/tags/kubernetes/</guid>
       <description></description>
