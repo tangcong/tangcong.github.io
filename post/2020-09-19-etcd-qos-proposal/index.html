@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://tangcong.github.io/img/home-bg-jeep.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io/img/home-bg-jeep.jpg" />
+    
+
+    
+    <meta name="title" content="etcd QoS proposal" />
+    <meta property="og:title" content="etcd QoS proposal" />
+    <meta property="twitter:title" content="etcd QoS proposal" />
+    
+
+    
+    <meta name="description" content="etcd,QoS,k8s,stability,performance,priority,fairness,expensive request">
+    <meta property="og:description" content="etcd,QoS,k8s,stability,performance,priority,fairness,expensive request" />
+    <meta property="twitter:description" content="etcd,QoS,k8s,stability,performance,priority,fairness,expensive request" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>etcd QoS proposal-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/post/2020-09-19-etcd-qos-proposal/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/home-bg-jeep.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/etcdkubernetes" title="etcd,kubernetes">
+                            etcd,kubernetes
+                        </a>
+                        
+                    </div>
+                    <h1>etcd QoS proposal</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Saturday, September 19, 2020
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#background">Background</a></li>
+        <li><a href="#goals">Goals</a></li>
+        <li><a href="#non-goals">Non-Goals</a></li>
+        <li><a href="#future-goals">Future Goals</a></li>
+        <li><a href="#proposal">Proposal</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <p>##etcd QoS Feature Design(draft)</p>
+<ul>
+<li>status: in progress.</li>
+<li>create date: 2020-03-30(draft)(tangcong)</li>
+<li>updated: 2020-09-14, DbUsedBytes optimzed to PercentOfStorageQuotaUsed,thanks piotr tabor.</li>
+<li>update: 2020-09-16, add related work,thanks joe betz.</li>
+<li>update: 2020-09-16, add thoughts on decomposing the rules(piotr tabor)</li>
+<li>update: 2020-09-17,add faq, simplify qos rule(tang cong)</li>
+<li>update: 2020-09-18,list detailed Goals/Non-Goals/Future Goals.(tang cong)</li>
+</ul>
+<h2 id="background">Background</h2>
+<p>As the metadata storage of kubernetes, etcd, stability is extremely important. However, at present, etcd will consume a lot of CPU, memory, and bandwidth resources in the face of some highly concurrent expensive read / write requests, resulting in high service load, even OOM, etc. Common expensive requests such as full keyspace fetch, a lot of event queries(list event), a lot of pod queries(list pods),  a lot of crd queries(list crd), and a lot of configmap writes.</p>
+<p>In fact, expensive requests may be common. some newbies will not follow the best practices of k8s. Some of their services are only deployed in one namespace with thousands of pods, and some will write tens of thousands of custom resources to the same namespace, and some write a large number of events when the service is abnormal. if there are too many resources in one namespace, get resources through the label, or list all resources, it may cause etcd memory and load to increase.(apiserver is not the only client, but it is the most typical, so the examples I give are related to apiserver. Clients in other scenarios such as configuration center, service discovery, and scheduling services also have the same problem)</p>
+<p>At the same time, etcd currently has only an extremely simple speed limit protection. When etcd&rsquo;s committed index is greater than the applied index threshold is greater than 5000, it will reject all requests and return the error ErrTooManyRequests. Therefore, its shortcomings are obvious, it is impossible to accurately limit the speed of expensive read / write requests, and it cannot effectively prevent the cluster from being overloaded.</p>
+<p>Therefore, I hope to implement a QoS feature that allows users to set the maximum qps under different paths and grpc methods, and can automatically identify expensive read / write requests and limit their speed to prevent etcd overload and further improve etcd cluster Stability.</p>
+<h2 id="goals">Goals</h2>
+<ul>
+<li>Provide a mechanism to match and limit expensive requests to prevent etcd performance degradation or even OOM, unavailability. (P0)</li>
+<li>Prevent etcd from being unwritable due to a large number of unimportant data being written(such as events).(P1)</li>
+<li>Provide very simple rate limiting capabilities for multi-tenant scenarios.(P2)</li>
+<li>Support  the configuration QoS rules based on multiple attributes and conditions (such as operations(RangeRequest,PutRequest,DeleteRequest,Authenticate), key prefix, caller user, percentOfStorageQuotaUsed, traffic, NumberOfKeyScan, latency).</li>
+<li>Support multiple queue discipline kind/shaping algorithms(such as token bucket filter, leaky bucket filter), with good scalability.</li>
+<li>Different QoS rules support the configuration of different queue discipline, priority. if a request satisfies multiple rules, the rule with the highest priority is selected.In general(except the used db size is close to quota), non-expensive requests are not subjected to any rules by default.</li>
+<li>The cpu and memory consumption of the QoS feature can be controlled without significantly reducing the etcd server performance.(P0)</li>
+</ul>
+<h2 id="non-goals">Non-Goals</h2>
+<ul>
+<li>QoS rules do not apply to the entire cluster, but to every node.</li>
+<li>Fairness is not our goal, our core goal is to limit expensive requests and make cluster more robust.Under normal circumstances, non-expensive requests will not be subject to any QoS rule.</li>
+<li>WATCH requests are out of scope.</li>
+<li>This Proposal will not attempt auto-tuning the QoS Rule. Instead the administrator will configure the QoS rule via QoS API.</li>
+</ul>
+<h2 id="future-goals">Future Goals</h2>
+<ul>
+<li>Support to match large traffic and high latency requests.</li>
+<li>Implement the QoS Watch command to help users to set QoS Rules.</li>
+<li>Automatically recognize the expensive request and limit the rate appropriately to prevent etcd from being unavailable.</li>
+</ul>
+<h2 id="proposal">Proposal</h2>
+<h3 id="identify-expensive-request">Identify Expensive Request</h3>
+<p>Expensive requests can be divided into two categories, one is cpu resource-consuming and the other is high traffic requests.</p>
+<p>● CPU resource consumption type</p>
+<p>CPU resource consumption types include full keyspace fetch and a large number of keys queries,etc. On the one hand, it can be judged by the number of keys scanned from the kvindex tree..</p>
+<pre><code>revpairs := tr.s.kvindex.Revisions(key, end, rev)
+tr.trace.Step(&quot;range keys from in-memory index tree&quot;)
+if len(revpairs) == 0 {
+return &amp;RangeResult{KVs: nil, Count: 0, Rev: curRev}, nil
+}
+if ro.Count {
+return &amp;RangeResult{KVs: nil, Count: len(revpairs), Rev: curRev}, nil
+}
+</code></pre><p>On the other hand, Identify expensive cpu intensive requests through user experience or RPC latency data.</p>
+<p>such as the gRPC Authenticate Method, it will call auth&rsquo;s bcrpt.CompareHashAndPassword for password verification, which will consume a lot of CPU. There is no QPS limit, it is easy to make CPU high load (8 core and 32G machine, only supports 200 qps).</p>
+<p>● High traffic request type</p>
+<p>The high traffic request type will often cause the machine bandwidth to be exhausted, which will seriously cause etcd OOM, such as list all pods, list all configmap, list all crd. This scenario can be identified according to the size of the request packet and the response packet.</p>
+<h3 id="queue-discipline-kind">Queue Discipline Kind</h3>
+<p>QDisc(queue discipline)  is the core of QoS and traffic control. It determines how to handle it when etcd server receives a request.</p>
+<p>There are three main methods of traffic control:</p>
+<ol>
+<li>Shaping
+Speed ​​limit, the rate of requests to etcd servers is controlled below a threshold.</li>
+<li>Scheduling
+According to the importance of etcd rpc requests, it can be divided into different priority levels. etcd server prioritizes high-priority requests, and low-priority requests are processed last. For example, slow query and high traffic requests have the lowest priority, other requests have the highest priority or are not subject to flow control at all.</li>
+<li>Discard
+If the requested QPS exceeds the threshold, a rate limit error is returned to the client.</li>
+</ol>
+<p>In etcd, we use the shaping algorithm. The shaping algorithms suitable for etcd scenarios mainly include the following three:</p>
+<p>● Token bucket filter</p>
+<p>● leaky bucket filter</p>
+<p>● max inflight request filter</p>
+<h3 id="qos-class">QoS Class</h3>
+<p>We use the QoS Class to indicate what queue discipline is used for flow control. Each class corresponds to a unique class name (set by the user).</p>
+<p>The syntax for adding a QoS Class is as follows:</p>
+<pre><code>etcdctl qos class [add/del/get/list/update] name --qdisc-kind OPTIONS
+</code></pre><p>For example, add a class named slow-query, use the token bucket filter algorithm to limit the speed, and it allows bursts of up to &lsquo;burst&rsquo; to exceed the QPS, while still maintaining a moothed qps rate of  &lsquo;qps&rsquo;.</p>
+<pre><code>etcdctl qos class add slow-query --qdisc-kind tbf  --qps 10 --burst 12
+</code></pre><p>Add a class named high-traffic, use the max inflight request filter algorithm, and the maximum inflight request is allowed to be 5.</p>
+<pre><code>etcdctl qos class add high-traffic --qdisc-kind maxinflight --num 5
+</code></pre><p>By the way, the following QoS rule will use the above queue class name.</p>
+<h3 id="qos-rule">QoS Rule</h3>
+<p>We use QoS rules to match inbound requests, which can match the call source of the request, key prefix, requested operation, and when the specified conditions are met, and then associate the request to a queue class for flow control.</p>
+<pre><code>type Subject struct {
+  // User is the caller of user name(such as cert common name)
+  User string
+  // ClientIp is the caller of source ip.
+  ClientIp string
+}
+
+type QoSRule struct {
+  // QClassName indicates which queue class is used for flow control.(such as high-traffic,slow-query)
+  QClassName string
+  // Priority is used to choose among the QoS Rules that match a given request.
+  // it indicates the priority of this rule,when a request satisfies multiple rules,
+  // the rule with the highest priority is selected.
+  // Priority value must be ranged in [1,100].
+  Priority int
+  //Subjects is the list of normal user, clientip that this rule cares about.
+  Subject []Subject
+  // PrefixPaths is a list of matching key prefix
+  // such as registry/events
+  PrefixPaths []string
+  // Ops is a list of matching operations(RequestRange,RequestPut,RequestDelete), and so it can support txn.
+  Ops []string
+  // Conditions is a list of matching conditions.
+  Conditions []Condition
+}
+
+type ConditionKind string
+
+const (
+  ConditionKindPercentDBQuotaUsed ConditionKind = &quot;PercentOfStorageQuotaUsed&quot;
+  ConditionKindNumberOfScanKey    ConditionKind = &quot;ScanKeyNum&quot;
+  ConditionKindRequestSize        ConditionKind = &quot;RequestSize&quot;
+  ConditionKindResponseSize       ConditionKind = &quot;ResponseSize&quot;
+  ConditionKindTotalTrafficSize   ConditionKind = &quot;TotalTraffic&quot;
+  ConditionKindRequestLatency     ConditionKind = &quot;RequestLatency&quot;
+)
+
+type Condition struct {
+  // Kind specify condition kind name,for example,ConditionKindPercentDBQuotaUsed.
+  Kind ConditionKind
+  // Threshold is a comparison value for whether the condition is met.
+  // For Example, If Kind is ConditionKindPercentDBQuotaUsed,
+  // and when PercentOfStorageQuotaUsed &gt; Threshold,the rule will take effect.
+  Threshold float64
+}
+
+</code></pre><p>The QoS Rule has the following field and attribute:</p>
+<p>● QClassName</p>
+<p>QClassName indicates which queue class is used for flow control (for example, the class we created above,slow-query,high-traffic)</p>
+<p>● Priority</p>
+<p>priority is used to choose among the QoS Rules that match a given request.it indicates the priority of this rule,when a request satisfies multiple rules,the rule with the highest priority is selected. If multiple QoS Rules with equal priority match the same request, the one with a lexicographically smaller name will win, but it&rsquo;s better not to rely on this, and instead to ensure that no two QoS Rule have the same priority. I expect that under normal circumstances, the number of QoS rules is very small, not more than 100,so priority value must be ranged in [1,100].</p>
+<p>● Subject</p>
+<p>Subjects is the list of normal user, clientip that this rule cares about.</p>
+<p>● Prefix key path</p>
+<p>PrefixPaths is a list of matching key prefixes,such as registry/events.</p>
+<p>● Ops</p>
+<p>Ops is a list of matching operations(RequestRange,RequestPut,RequestDelete,Authenticate), and so it can support txn.</p>
+<p>QoS Rule also has the following conditional attributes:</p>
+<p>● condition/PercentOfStorageQuotaUsed</p>
+<p>Support to match inbound requests when PercentOfStorageQuotaUsed(backendDBInUse / backendDBQuota) is greater than the threshold.</p>
+<p>● condition/traffic（implement later）</p>
+<p>Support to  match high traffic requests  when rpc requests traffic(request,response,sum of request and response) is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>● Condition/numberOfScanKey</p>
+<p>Support to match slow query read requests when the number of keys scan is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>● Condition/latency（implement later）</p>
+<p>Support to match high latency requests when rpc latency is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>For example one，if we want to limit TXN(RequestOp_RequestPut) requests to less than 2(qps)
+when &lsquo;percentOfStorageQuotaUsed &gt; 90% and prefix key is registry/events, it can describe as follows:</p>
+<pre><code>// create queue class for event
+etcdctl qos class add event --qdisc-kind lbf  --qps 2
+
+// create qos rule to match k8s event write request
+etcdctl qos rule add rule-event 
+       --qclassName event
+       --priority 9
+       --prefixPaths registry/events 
+       --ops RequestPut
+       --condition-kind ConditionKindPercentDBQuotaUsed
+       --condition-threshold 0.9
+
+</code></pre><p>If we build in this QoS rule in etcd,we can prevent etcd from being unwritable in abnormal situations.</p>
+<p>For example two，if we want to limit slow query(Range) requests to less than 10(qps),burst(12)
+when &lsquo;NumberOfScanKeyNum &gt; 1000 and prefix key is registry/pods, it can describe as follows:</p>
+<pre><code>// create queue class for slowlog
+etcdctl qos class add slow-query --qdisc-kind tbf  --qps 10 --burst 12
+
+// create qos rule to match slowquery request
+etcdctl qos rule add rule-slowlog
+       --qclassName slow-query
+       --priority 10
+       --ops Range
+       --prefixPaths registry/pods
+       --condition-kind NumberOfScanKeyNum
+       --condition-threshold 1000.0
+
+</code></pre><p>If we build in this QoS rule in etcd,we can avoid slow query results in etcd oom or costing too much memory(#issue12256).</p>
+<p>Add a QoS rule as shown in the example above. we will implement the QoS Rule API of add, get, update, and delete and related etcdctl QoS Rule command.</p>
+<h3 id="track-expensive-request">Track Expensive Request</h3>
+<p>How to record whether a request is a cpu resource-consumable and a high-traffic type with controllable memory overhead?
+The following are my thoughts. When a request is received, the processing steps are as follows:</p>
+<ol>
+<li>When the server starts, create a fixed size LRU Cache.</li>
+<li>When receiving a read request, calculate the hash value of the request.</li>
+<li>Attempt to find out from LRU Cache whether it exists, if it exists, and meet at least one rule of QoS Rule, then select the rule with the highest priority to execute flow control. If it is speed limited, return ErrLimitRequest to the client.</li>
+<li>Execute the rpc interface.</li>
+<li>After execution, if the rpc request already exists in the LRU queue or its runtime information (latency/traffic/scanKeyNum, etc.) meets at least one QoS rule, the runtime information is updated to the LRU cache queue.</li>
+</ol>
+<h3 id="instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</h3>
+<p>When the etcd machine bandwidth and memory are about to be exhausted, how to quickly locate which request? (of course, metric monitoring and logging can also play a role,but not so fast and precise).  And set reasonable QoS rules to limit it? Or see which requests are affected by QoS rules?</p>
+<p>We can design and implement a QoS monitor command(Streaming RPC) to collect and filter rpc requests in real time, and return the rpc requests that meet the conditions.</p>
+<p>The qos monitor syntax is as follows:</p>
+<pre><code>etcdctl qos monitor --type (latency/traffic/scanKeyNum) --threshold --limit (&lt;100)
+
+Types support the following:
+scanKeyNum
+Specify request scanKeyNum,when the request scanKeyNum is greater than the threshold, at most limit requests are collected.
+
+rpc latency
+Specify rpc latency,when the rpc latency is greater than the threshold, at most limit requests are collected.
+
+rpc traffic
+Specify rpc traffic. When the rpc packet size is greater than the threshold, maximum limit requests are collected.
+</code></pre><h3 id="thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</h3>
+<p>The goal of this section is to discuss/understand what types of information build a rule.
+This will allow to shape the proper API / protos that are expandable and easy to understand for the users:</p>
+<p>Example:  “Each user can send List requests that scan 10000 keys in 1-minute windows. “</p>
+<h4 id="selector-list-requests">Selector (“List requests”):</h4>
+<ul>
+<li>Is defining which requests are subject to the rule. The request can be identified by:</li>
+<li>Service Name</li>
+<li>Method Name</li>
+<li>User Name (identity of sender)</li>
+<li>Key-range (for majority of requests). Please note that the rules of matching key-range by request depend on the request type. In practice we should check if the ranges overlap:</li>
+<li>Watch /foo/… should match the rule for range “/foo/bar/…” as the ranges overlap.</li>
+<li>Watch /foo/bar/.. . should match the rule for “/foo/&hellip;” as the ranges overlap.</li>
+<li>Put /foo/x should not match the rule for range “for/bar/…” as the ranges do not overlap.</li>
+<li>Stretch: Number of retry of this very request</li>
+<li>Stretch: Caller IP address.</li>
+</ul>
+<h4 id="cost">Cost</h4>
+<ul>
+<li>Cost (“that scan … keys”):</li>
+<li>Count of requests (aka QPS)</li>
+<li>Count of ‘failed requests’  (‘if the user is sending bad request they should be throttled more than the successful ones’)</li>
+<li>Sum of incoming request sizes</li>
+<li>Sum of generated traffic (incoming request_sizes + response_sizes).</li>
+<li>requires some prediction of a response_size</li>
+<li>Number of scanned keys [requires prediction]</li>
+<li>Total wall-time spent on serving requests [requires prediction]</li>
+<li>Total cpu-time spent on serving the requests [requires prediction]</li>
+</ul>
+<h4 id="accounting-group-per-each-user">Accounting Group (“per each user”):</h4>
+<p>By default we have a limit per-rule, i.e. per-server. Server either accepts the requests that match Selector or refuse them, but makes the decision based on a ‘single’ state.
+But Quality of Service solutions want to protect one ‘user’ / ‘type of calls’ / ‘key-space’ from others. So by accounting we might express that the rules are evaluated per some properties like:
+User
+IP</p>
+<h4 id="key-space-pattern">Key-space pattern</h4>
+<p>Note that if we have 2 users: Alice and Bob we might simulating “grouping” by defining 2 rules:</p>
+<p>Alice can send 10 qps. Bob can send 10 qps.
+If the administrator does not want to reconfigure the rules every time they add a new user, they need some form of grouping setting. I guess its low-priority feature, but adding it for completeness.</p>
+<h4 id="aggregation-method">Aggregation method:</h4>
+<ul>
+<li>Running windows of given size: e.g. 10000 “units of cost” in 100s. (please not that it’s different from 100req /s ) as the former allows bursts to 10k</li>
+<li>Token bucket filter  (not sure if it can be applied to different costs)</li>
+<li>leaky bucket filter, etcd. (not sure if it can be applied to different costs)</li>
+<li>In flight counter (when requests starts we bump the counter, if finishes we decrease),</li>
+<li>In practice applied to the ‘count’ cost. In theory we could say: we admit request of summarized size up to 1MB concurrently.</li>
+</ul>
+<p>Limit: e.g. 10000  (“units of costs” aggregated using “aggregation method” per “Accounting group” of requests that match the “selector”)
+Metrics
+To implement metrics, report the number of requests that are speed-limited and the number of expensive requests.</p>
+<h3 id="alternative-solution">Alternative Solution</h3>
+<h3 id="faq">FAQ</h3>
+<p>1、How to  track expensive requests and make a decision on whether to limit a request?</p>
+<p>Yue9944882: Not knowing the time/cpu/memory/traffic size consumption unless the request&rsquo;s finished,kubernetes uses an &ldquo;estimated&rdquo; cost.</p>
+<p>we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>2、How to shape the traffic?</p>
+<p>Fairness is not our goal, our core goal is to limit expensive requests.meanwhile,etcd node does not frequently adjust the size of cpu and memory resources and non-expensive requests will not be subject to any QoS rule. So we use multiple rate limiters to shape the expensive traffic, not k8s fair queue.
+3、How to support txn?
+We should match operations not gRPCMethod.</p>
+<p>4、Should we need to assign a priority to each rule? How to choose a rule if multiple rules have the same priority?</p>
+<p>Yes, the rule with higher priority is the strictest. If multiple QoS Rules with equal priority match the same request, the one with a lexicographically smaller name will win, but it&rsquo;s better not to rely on this, and instead to ensure that no two QoS Rule have the same priority.</p>
+<p>Wojtek-t: I would say that this should then be validated during creation (i.e. ensure that no two rules with the same priority can match the same request).</p>
+<p>5、How to measure QoS Feature without affecting stability and performance？</p>
+<p>6、Should we support custom rules?</p>
+<p>Wojtek-t: I&rsquo;m also slightly against custom rule - either we already have usecase for rules, or we don&rsquo;t (and then don&rsquo;t overengineer).</p>
+<p>Done, we no longer need custom rules,  QoS Rules can match and meet the needs of various scenarios.</p>
+<p>7、How to Distinguish the identity of Callers?</p>
+<p>User name/(auth info),client ip</p>
+<p>8、How we&rsquo;re going to test: correctness testing, scale testing, performance impact?</p>
+<p>9、Which rule should we make it built-in(if users enable qos feature)?</p>
+<p>We can build in slow query rules into etcd when the user enables the qos feature.
+For example, add a rule to limit slow query(Range) requests to less than 10(qps),burst(12)
+when &lsquo;NumberOfScanKeyNum &gt; 10000:</p>
+<pre><code>// create queue class for slowlog
+etcdctl qos class add slow-query --qdisc-kind tbf  --qps 10 --burst 12
+
+// create qos rule to match slowquery request
+etcdctl qos rule add rule-slowlog
+--qclassName slow-query
+--priority 10
+--ops Range
+--condition-kind NumberOfScanKeyNum
+--condition-threshold 1000.0
+</code></pre><p>10、What is an expensive request?</p>
+<p>Large request and response packets, read requests that scan a large number of keys, Authenticate may be expensive requests.</p>
+<h3 id="future-work">Future Work</h3>
+<p>First, We can Support to match large traffic and high latency requests based on community feedback and implement QoS Watch to help users to set QoS Rules.</p>
+<p>Secondly,Similar to the function of redis latency / memory doctor, intelligent optimization suggestions are given.</p>
+<p>Finally,Automatically recognize the expensive request and limit the rate appropriately to prevent etcd from being unavailable.</p>
+<h3 id="related-work">Related Work</h3>
+<ul>
+<li>Kubernetes Priority and Fairness KEP</li>
+<li>Kubernetes Priority and Fairness Documentation</li>
+</ul>
+<h3 id="related-issues">Related Issues</h3>
+<p><a href="https://github.com/etcd-io/etcd/issues/8483">https://github.com/etcd-io/etcd/issues/8483</a>
+<a href="https://github.com/etcd-io/etcd/issues/12164">https://github.com/etcd-io/etcd/issues/12164</a>
+<a href="https://github.com/etcd-io/etcd/issues/10084">https://github.com/etcd-io/etcd/issues/10084</a>
+<a href="https://github.com/etcd-io/etcd/issues/7381">https://github.com/etcd-io/etcd/issues/7381</a>
+<a href="https://github.com/etcd-io/etcd/issues/12256">https://github.com/etcd-io/etcd/issues/12256</a></p>
+<h3 id="latest-draft-proposal-and-poc">Latest draft proposal and POC</h3>
+<p><a href="https://docs.google.com/document/d/122e-uLqngbL9qUEHx4pWcxQj8WO4PCbItTZ-jtkt7ik/edit?usp=sharing">etcd QoS Feature Design</a></p>
+<p><a href="https://github.com/etcd-io/etcd/pull/12290">etcd QoS POC</a></p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2020-07-05-etcd-stability-and-performance-optimization-practices/" data-toggle="tooltip" data-placement="top" title="万级k8s集群背后的etcd稳定性与性能优化实践">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        <a href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        <a href="/tags/etcdkubernetes" title="etcdkubernetes">
+                            etcdkubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        <a href="/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2020
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

@@ -6,10 +6,19 @@
     <description>Recent content in etcd,kubernetes on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 05 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://tangcong.github.io/tags/etcdkubernetes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>etcd QoS proposal</title>
+      <link>https://tangcong.github.io/post/2020-09-19-etcd-qos-proposal/</link>
+      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2020-09-19-etcd-qos-proposal/</guid>
+      <description>##etcd QoS Feature Design(draft) status: in progress. create date: 2020-03-30(draft)(tangcong) updated: 2020-09-14, DbUsedBytes optimzed to PercentOfStorageQuotaUsed,thanks piotr tabor. update: 2020-09-16, add related work,thanks joe betz. update: 2020-09-16, add thoughts on decomposing the rules(piotr tabor) update: 2020-09-17,add faq, simplify qos rule(tang cong) update: 2020-09-18,list detailed Goals/Non-Goals/Future Goals.(tang cong) Background As the metadata storage of kubernetes, etcd, stability is extremely important. However, at present, etcd will consume a lot of CPU, memory,</description>
+    </item>
     
     <item>
       <title>万级k8s集群背后的etcd稳定性与性能优化实践</title>
