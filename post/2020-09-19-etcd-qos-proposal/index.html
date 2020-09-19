@@ -206,19 +206,32 @@
                 </header>
                 <nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#etcd-qos-feature-designdraft">etcd QoS Feature Design(draft)</a></li>
+    <li><a href="#background">Background</a></li>
+    <li><a href="#goals">Goals</a></li>
+    <li><a href="#non-goals">Non-Goals</a></li>
+    <li><a href="#future-goals">Future Goals</a></li>
+    <li><a href="#proposal">Proposal</a>
       <ul>
-        <li><a href="#background">Background</a></li>
-        <li><a href="#goals">Goals</a></li>
-        <li><a href="#non-goals">Non-Goals</a></li>
-        <li><a href="#future-goals">Future Goals</a></li>
-        <li><a href="#proposal">Proposal</a></li>
+        <li><a href="#identify-expensive-request">Identify Expensive Request</a></li>
+        <li><a href="#queue-discipline-kind">Queue Discipline Kind</a></li>
+        <li><a href="#qos-class">QoS Class</a></li>
+        <li><a href="#qos-rule">QoS Rule</a></li>
+        <li><a href="#track-expensive-request">Track Expensive Request</a></li>
+        <li><a href="#instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</a></li>
+        <li><a href="#thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</a></li>
+        <li><a href="#alternative-solution">Alternative Solution</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#future-work">Future Work</a></li>
+        <li><a href="#related-work">Related Work</a></li>
+        <li><a href="#related-issues">Related Issues</a></li>
+        <li><a href="#latest-draft-proposal-and-poc">Latest draft proposal and POC</a></li>
       </ul>
     </li>
   </ul>
 </nav>
                 
-                <p>##etcd QoS Feature Design(draft)</p>
+                <h1 id="etcd-qos-feature-designdraft">etcd QoS Feature Design(draft)</h1>
 <ul>
 <li>status: in progress.</li>
 <li>create date: 2020-03-30(draft)(tangcong)</li>
@@ -228,12 +241,12 @@
 <li>update: 2020-09-17,add faq, simplify qos rule(tang cong)</li>
 <li>update: 2020-09-18,list detailed Goals/Non-Goals/Future Goals.(tang cong)</li>
 </ul>
-<h2 id="background">Background</h2>
+<h1 id="background">Background</h1>
 <p>As the metadata storage of kubernetes, etcd, stability is extremely important. However, at present, etcd will consume a lot of CPU, memory, and bandwidth resources in the face of some highly concurrent expensive read / write requests, resulting in high service load, even OOM, etc. Common expensive requests such as full keyspace fetch, a lot of event queries(list event), a lot of pod queries(list pods),  a lot of crd queries(list crd), and a lot of configmap writes.</p>
 <p>In fact, expensive requests may be common. some newbies will not follow the best practices of k8s. Some of their services are only deployed in one namespace with thousands of pods, and some will write tens of thousands of custom resources to the same namespace, and some write a large number of events when the service is abnormal. if there are too many resources in one namespace, get resources through the label, or list all resources, it may cause etcd memory and load to increase.(apiserver is not the only client, but it is the most typical, so the examples I give are related to apiserver. Clients in other scenarios such as configuration center, service discovery, and scheduling services also have the same problem)</p>
 <p>At the same time, etcd currently has only an extremely simple speed limit protection. When etcd&rsquo;s committed index is greater than the applied index threshold is greater than 5000, it will reject all requests and return the error ErrTooManyRequests. Therefore, its shortcomings are obvious, it is impossible to accurately limit the speed of expensive read / write requests, and it cannot effectively prevent the cluster from being overloaded.</p>
 <p>Therefore, I hope to implement a QoS feature that allows users to set the maximum qps under different paths and grpc methods, and can automatically identify expensive read / write requests and limit their speed to prevent etcd overload and further improve etcd cluster Stability.</p>
-<h2 id="goals">Goals</h2>
+<h1 id="goals">Goals</h1>
 <ul>
 <li>Provide a mechanism to match and limit expensive requests to prevent etcd performance degradation or even OOM, unavailability. (P0)</li>
 <li>Prevent etcd from being unwritable due to a large number of unimportant data being written(such as events).(P1)</li>
@@ -243,21 +256,21 @@
 <li>Different QoS rules support the configuration of different queue discipline, priority. if a request satisfies multiple rules, the rule with the highest priority is selected.In general(except the used db size is close to quota), non-expensive requests are not subjected to any rules by default.</li>
 <li>The cpu and memory consumption of the QoS feature can be controlled without significantly reducing the etcd server performance.(P0)</li>
 </ul>
-<h2 id="non-goals">Non-Goals</h2>
+<h1 id="non-goals">Non-Goals</h1>
 <ul>
 <li>QoS rules do not apply to the entire cluster, but to every node.</li>
 <li>Fairness is not our goal, our core goal is to limit expensive requests and make cluster more robust.Under normal circumstances, non-expensive requests will not be subject to any QoS rule.</li>
 <li>WATCH requests are out of scope.</li>
 <li>This Proposal will not attempt auto-tuning the QoS Rule. Instead the administrator will configure the QoS rule via QoS API.</li>
 </ul>
-<h2 id="future-goals">Future Goals</h2>
+<h1 id="future-goals">Future Goals</h1>
 <ul>
 <li>Support to match large traffic and high latency requests.</li>
 <li>Implement the QoS Watch command to help users to set QoS Rules.</li>
 <li>Automatically recognize the expensive request and limit the rate appropriately to prevent etcd from being unavailable.</li>
 </ul>
-<h2 id="proposal">Proposal</h2>
-<h3 id="identify-expensive-request">Identify Expensive Request</h3>
+<h1 id="proposal">Proposal</h1>
+<h2 id="identify-expensive-request">Identify Expensive Request</h2>
 <p>Expensive requests can be divided into two categories, one is cpu resource-consuming and the other is high traffic requests.</p>
 <p>● CPU resource consumption type</p>
 <p>CPU resource consumption types include full keyspace fetch and a large number of keys queries,etc. On the one hand, it can be judged by the number of keys scanned from the kvindex tree..</p>
@@ -273,7 +286,7 @@ return &amp;RangeResult{KVs: nil, Count: len(revpairs), Rev: curRev}, nil
 <p>such as the gRPC Authenticate Method, it will call auth&rsquo;s bcrpt.CompareHashAndPassword for password verification, which will consume a lot of CPU. There is no QPS limit, it is easy to make CPU high load (8 core and 32G machine, only supports 200 qps).</p>
 <p>● High traffic request type</p>
 <p>The high traffic request type will often cause the machine bandwidth to be exhausted, which will seriously cause etcd OOM, such as list all pods, list all configmap, list all crd. This scenario can be identified according to the size of the request packet and the response packet.</p>
-<h3 id="queue-discipline-kind">Queue Discipline Kind</h3>
+<h2 id="queue-discipline-kind">Queue Discipline Kind</h2>
 <p>QDisc(queue discipline)  is the core of QoS and traffic control. It determines how to handle it when etcd server receives a request.</p>
 <p>There are three main methods of traffic control:</p>
 <ol>
@@ -288,7 +301,7 @@ If the requested QPS exceeds the threshold, a rate limit error is returned to th
 <p>● Token bucket filter</p>
 <p>● leaky bucket filter</p>
 <p>● max inflight request filter</p>
-<h3 id="qos-class">QoS Class</h3>
+<h2 id="qos-class">QoS Class</h2>
 <p>We use the QoS Class to indicate what queue discipline is used for flow control. Each class corresponds to a unique class name (set by the user).</p>
 <p>The syntax for adding a QoS Class is as follows:</p>
 <pre><code>etcdctl qos class [add/del/get/list/update] name --qdisc-kind OPTIONS
@@ -297,7 +310,7 @@ If the requested QPS exceeds the threshold, a rate limit error is returned to th
 </code></pre><p>Add a class named high-traffic, use the max inflight request filter algorithm, and the maximum inflight request is allowed to be 5.</p>
 <pre><code>etcdctl qos class add high-traffic --qdisc-kind maxinflight --num 5
 </code></pre><p>By the way, the following QoS rule will use the above queue class name.</p>
-<h3 id="qos-rule">QoS Rule</h3>
+<h2 id="qos-rule">QoS Rule</h2>
 <p>We use QoS rules to match inbound requests, which can match the call source of the request, key prefix, requested operation, and when the specified conditions are met, and then associate the request to a queue class for flow control.</p>
 <pre><code>type Subject struct {
   // User is the caller of user name(such as cert common name)
@@ -396,7 +409,7 @@ etcdctl qos rule add rule-slowlog
 
 </code></pre><p>If we build in this QoS rule in etcd,we can avoid slow query results in etcd oom or costing too much memory(#issue12256).</p>
 <p>Add a QoS rule as shown in the example above. we will implement the QoS Rule API of add, get, update, and delete and related etcdctl QoS Rule command.</p>
-<h3 id="track-expensive-request">Track Expensive Request</h3>
+<h2 id="track-expensive-request">Track Expensive Request</h2>
 <p>How to record whether a request is a cpu resource-consumable and a high-traffic type with controllable memory overhead?
 The following are my thoughts. When a request is received, the processing steps are as follows:</p>
 <ol>
@@ -406,7 +419,7 @@ The following are my thoughts. When a request is received, the processing steps 
 <li>Execute the rpc interface.</li>
 <li>After execution, if the rpc request already exists in the LRU queue or its runtime information (latency/traffic/scanKeyNum, etc.) meets at least one QoS rule, the runtime information is updated to the LRU cache queue.</li>
 </ol>
-<h3 id="instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</h3>
+<h2 id="instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</h2>
 <p>When the etcd machine bandwidth and memory are about to be exhausted, how to quickly locate which request? (of course, metric monitoring and logging can also play a role,but not so fast and precise).  And set reasonable QoS rules to limit it? Or see which requests are affected by QoS rules?</p>
 <p>We can design and implement a QoS monitor command(Streaming RPC) to collect and filter rpc requests in real time, and return the rpc requests that meet the conditions.</p>
 <p>The qos monitor syntax is as follows:</p>
@@ -421,11 +434,11 @@ Specify rpc latency,when the rpc latency is greater than the threshold, at most 
 
 rpc traffic
 Specify rpc traffic. When the rpc packet size is greater than the threshold, maximum limit requests are collected.
-</code></pre><h3 id="thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</h3>
+</code></pre><h2 id="thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</h2>
 <p>The goal of this section is to discuss/understand what types of information build a rule.
 This will allow to shape the proper API / protos that are expandable and easy to understand for the users:</p>
 <p>Example:  “Each user can send List requests that scan 10000 keys in 1-minute windows. “</p>
-<h4 id="selector-list-requests">Selector (“List requests”):</h4>
+<h3 id="selector-list-requests">Selector (“List requests”):</h3>
 <ul>
 <li>Is defining which requests are subject to the rule. The request can be identified by:</li>
 <li>Service Name</li>
@@ -438,7 +451,7 @@ This will allow to shape the proper API / protos that are expandable and easy to
 <li>Stretch: Number of retry of this very request</li>
 <li>Stretch: Caller IP address.</li>
 </ul>
-<h4 id="cost">Cost</h4>
+<h3 id="cost">Cost</h3>
 <ul>
 <li>Cost (“that scan … keys”):</li>
 <li>Count of requests (aka QPS)</li>
@@ -450,16 +463,16 @@ This will allow to shape the proper API / protos that are expandable and easy to
 <li>Total wall-time spent on serving requests [requires prediction]</li>
 <li>Total cpu-time spent on serving the requests [requires prediction]</li>
 </ul>
-<h4 id="accounting-group-per-each-user">Accounting Group (“per each user”):</h4>
+<h3 id="accounting-group-per-each-user">Accounting Group (“per each user”):</h3>
 <p>By default we have a limit per-rule, i.e. per-server. Server either accepts the requests that match Selector or refuse them, but makes the decision based on a ‘single’ state.
 But Quality of Service solutions want to protect one ‘user’ / ‘type of calls’ / ‘key-space’ from others. So by accounting we might express that the rules are evaluated per some properties like:
 User
 IP</p>
-<h4 id="key-space-pattern">Key-space pattern</h4>
+<h3 id="key-space-pattern">Key-space pattern</h3>
 <p>Note that if we have 2 users: Alice and Bob we might simulating “grouping” by defining 2 rules:</p>
 <p>Alice can send 10 qps. Bob can send 10 qps.
 If the administrator does not want to reconfigure the rules every time they add a new user, they need some form of grouping setting. I guess its low-priority feature, but adding it for completeness.</p>
-<h4 id="aggregation-method">Aggregation method:</h4>
+<h3 id="aggregation-method">Aggregation method:</h3>
 <ul>
 <li>Running windows of given size: e.g. 10000 “units of cost” in 100s. (please not that it’s different from 100req /s ) as the former allows bursts to 10k</li>
 <li>Token bucket filter  (not sure if it can be applied to different costs)</li>
@@ -470,8 +483,8 @@ If the administrator does not want to reconfigure the rules every time they add 
 <p>Limit: e.g. 10000  (“units of costs” aggregated using “aggregation method” per “Accounting group” of requests that match the “selector”)
 Metrics
 To implement metrics, report the number of requests that are speed-limited and the number of expensive requests.</p>
-<h3 id="alternative-solution">Alternative Solution</h3>
-<h3 id="faq">FAQ</h3>
+<h2 id="alternative-solution">Alternative Solution</h2>
+<h2 id="faq">FAQ</h2>
 <p>1、How to  track expensive requests and make a decision on whether to limit a request?</p>
 <p>Yue9944882: Not knowing the time/cpu/memory/traffic size consumption unless the request&rsquo;s finished,kubernetes uses an &ldquo;estimated&rdquo; cost.</p>
 <p>we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
@@ -505,24 +518,28 @@ etcdctl qos rule add rule-slowlog
 --condition-threshold 1000.0
 </code></pre><p>10、What is an expensive request?</p>
 <p>Large request and response packets, read requests that scan a large number of keys, Authenticate may be expensive requests.</p>
-<h3 id="future-work">Future Work</h3>
+<h2 id="future-work">Future Work</h2>
 <p>First, We can Support to match large traffic and high latency requests based on community feedback and implement QoS Watch to help users to set QoS Rules.</p>
 <p>Secondly,Similar to the function of redis latency / memory doctor, intelligent optimization suggestions are given.</p>
 <p>Finally,Automatically recognize the expensive request and limit the rate appropriately to prevent etcd from being unavailable.</p>
-<h3 id="related-work">Related Work</h3>
+<h2 id="related-work">Related Work</h2>
 <ul>
 <li>Kubernetes Priority and Fairness KEP</li>
 <li>Kubernetes Priority and Fairness Documentation</li>
 </ul>
-<h3 id="related-issues">Related Issues</h3>
-<p><a href="https://github.com/etcd-io/etcd/issues/8483">https://github.com/etcd-io/etcd/issues/8483</a>
-<a href="https://github.com/etcd-io/etcd/issues/12164">https://github.com/etcd-io/etcd/issues/12164</a>
-<a href="https://github.com/etcd-io/etcd/issues/10084">https://github.com/etcd-io/etcd/issues/10084</a>
-<a href="https://github.com/etcd-io/etcd/issues/7381">https://github.com/etcd-io/etcd/issues/7381</a>
-<a href="https://github.com/etcd-io/etcd/issues/12256">https://github.com/etcd-io/etcd/issues/12256</a></p>
-<h3 id="latest-draft-proposal-and-poc">Latest draft proposal and POC</h3>
-<p><a href="https://docs.google.com/document/d/122e-uLqngbL9qUEHx4pWcxQj8WO4PCbItTZ-jtkt7ik/edit?usp=sharing">etcd QoS Feature Design</a></p>
-<p><a href="https://github.com/etcd-io/etcd/pull/12290">etcd QoS POC</a></p>
+<h2 id="related-issues">Related Issues</h2>
+<ul>
+<li><a href="https://github.com/etcd-io/etcd/issues/8483">https://github.com/etcd-io/etcd/issues/8483</a></li>
+<li><a href="https://github.com/etcd-io/etcd/issues/12164">https://github.com/etcd-io/etcd/issues/12164</a></li>
+<li><a href="https://github.com/etcd-io/etcd/issues/10084">https://github.com/etcd-io/etcd/issues/10084</a></li>
+<li><a href="https://github.com/etcd-io/etcd/issues/7381">https://github.com/etcd-io/etcd/issues/7381</a></li>
+<li><a href="https://github.com/etcd-io/etcd/issues/12256">https://github.com/etcd-io/etcd/issues/12256</a></li>
+</ul>
+<h2 id="latest-draft-proposal-and-poc">Latest draft proposal and POC</h2>
+<ul>
+<li><a href="https://docs.google.com/document/d/122e-uLqngbL9qUEHx4pWcxQj8WO4PCbItTZ-jtkt7ik/edit?usp=sharing">etcd QoS Feature Design</a></li>
+<li><a href="https://github.com/etcd-io/etcd/pull/12290">etcd QoS POC</a></li>
+</ul>
 
 
                 
