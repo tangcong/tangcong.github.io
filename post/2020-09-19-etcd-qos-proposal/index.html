@@ -221,6 +221,7 @@
         <li><a href="#queue-discipline-kind">Queue Discipline Kind</a></li>
         <li><a href="#qos-class">QoS Class</a></li>
         <li><a href="#qos-rule">QoS Rule</a></li>
+        <li><a href="#how-to-estimate-numberofkeyscan-of-a-read-request">How to estimate NumberOfKeyScan of a read request</a></li>
         <li><a href="#track-expensive-request">Track Expensive Request</a></li>
         <li><a href="#instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</a></li>
         <li><a href="#thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</a></li>
@@ -413,6 +414,11 @@ etcdctl qos rule add rule-slowlog
 
 </code></pre><p>If we build in this QoS rule in etcd,we can avoid slow query results in etcd oom or costing too much memory(#issue12256).</p>
 <p>Add a QoS rule as shown in the example above. we will implement the QoS Rule API of add, get, update, and delete and related etcdctl QoS Rule command.</p>
+<h2 id="how-to-estimate-numberofkeyscan-of-a-read-request">How to estimate NumberOfKeyScan of a read request</h2>
+<p>We can use the segment/interval tree to count the number of keys within the query range.  segment tree, also known as a statistic tree, is a tree data structure used for storing information about intervals, or segments. For each interval we store the number of keys in this interval.</p>
+<p>For example, in the figure below, when we query a range [/a,/b], we can quickly get the number of keys.In order to control the memory overhead of segment tree, we need to introduce random algorithms for sampling statistics(to do,POC).</p>
+<p>Through this statistical information, we can predict slow queries and limit the speed in advance.</p>
+<p><img src="/img/segment-tree.png" alt="segment tree"></p>
 <h2 id="track-expensive-request">Track Expensive Request</h2>
 <p>How to record whether a request is a cpu resource-consumable and a high-traffic type with controllable memory overhead?
 The following are my thoughts. When a request is received, the processing steps are as follows:</p>
@@ -493,9 +499,9 @@ To implement metrics, report the number of requests that are speed-limited and t
 <p>Yue9944882: Not knowing the time/cpu/memory/traffic size consumption unless the request&rsquo;s finished,kubernetes uses an &ldquo;estimated&rdquo; cost.</p>
 <p>we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
 <p>2、How to shape the traffic?</p>
-<p>Fairness is not our goal, our core goal is to limit expensive requests.meanwhile,etcd node does not frequently adjust the size of cpu and memory resources and non-expensive requests will not be subject to any QoS rule. So we use multiple rate limiters to shape the expensive traffic, not k8s fair queue.
-3、How to support txn?
-We should match operations not gRPCMethod.</p>
+<p>Fairness is not our goal, our core goal is to limit expensive requests.meanwhile,etcd node does not frequently adjust the size of cpu and memory resources and non-expensive requests will not be subject to any QoS rule. So we use multiple rate limiters to shape the expensive traffic, not k8s fair queue.</p>
+<p>3、How to support txn?</p>
+<p>We should match operations not gRPCMethod.</p>
 <p>4、Should we need to assign a priority to each rule? How to choose a rule if multiple rules have the same priority?</p>
 <p>Yes, the rule with higher priority is the strictest. If multiple QoS Rules with equal priority match the same request, the one with a lexicographically smaller name will win, but it&rsquo;s better not to rely on this, and instead to ensure that no two QoS Rule have the same priority.</p>
 <p>Wojtek-t: I would say that this should then be validated during creation (i.e. ensure that no two rules with the same priority can match the same request).</p>
