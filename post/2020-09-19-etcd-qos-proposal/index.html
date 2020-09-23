@@ -215,6 +215,13 @@
     <li><a href="#goals">Goals</a></li>
     <li><a href="#non-goals">Non-Goals</a></li>
     <li><a href="#future-goals">Future Goals</a></li>
+    <li><a href="#alternative-solution">Alternative Solution</a>
+      <ul>
+        <li><a href="#priority-and-fairness--event-ratelimiter-only-for-k8s-apiserver">Priority and Fairness &amp; Event Ratelimiter (only for k8s apiserver)</a></li>
+        <li><a href="#qos-based-on-grpc-proxy">QoS based on gRPC Proxy</a></li>
+        <li><a href="#qos-based-on-etcd">QoS based on etcd</a></li>
+      </ul>
+    </li>
     <li><a href="#proposal">Proposal</a>
       <ul>
         <li><a href="#identify-expensive-request">Identify Expensive Request</a></li>
@@ -225,7 +232,7 @@
         <li><a href="#track-expensive-request">Track Expensive Request</a></li>
         <li><a href="#instruct-users-to-set-qos-rulesfuture-goal">Instruct users to set QoS Rules(Future Goal)</a></li>
         <li><a href="#thoughts-on-decomposing-the-rulesptabor">Thoughts on decomposing the rules(ptabor)</a></li>
-        <li><a href="#alternative-solution">Alternative Solution</a></li>
+        <li><a href="#alternative-solution-1">Alternative Solution</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#future-work">Future Work</a></li>
       </ul>
@@ -274,6 +281,23 @@
 <li>Implement the QoS Watch command to help users to set QoS Rules.</li>
 <li>Automatically recognize the expensive request and limit the rate appropriately to prevent etcd from being unavailable.</li>
 </ul>
+<h1 id="alternative-solution">Alternative Solution</h1>
+<h2 id="priority-and-fairness--event-ratelimiter-only-for-k8s-apiserver">Priority and Fairness &amp; Event Ratelimiter (only for k8s apiserver)</h2>
+<p>“API Priority And Fairness” is a new alpha feature in Kubernetes 1.18. Priority And Fairness permits cluster administrators to divide the concurrency of the control plane into different weighted priority levels. Based on it, we can issue rate-limiting policies for LIST operations targeting users, namespaces, and resources.</p>
+<p>For example, k8s newbies have written tens of thousands of CRDs in a namespace. In order to prevent potential LIST operations from affecting the stability of the cluster, we can set the number of concurrent requests based on P&amp;R, but the disadvantage is that apiserver does not know how many resources that etcd will return. if the user cleans up most of the Resources, the administrator also needs to manually increase the number of concurrent requests for this resource.(please correct me if i am wrong).</p>
+<p>in etcd QoS Feature, The rate limit will take effect only when NumberOfKeyScan is greater than a higher threshold. Therefore, if a client lists resources through the API without paging, even if the API Server allows a large number of concurrent requests, etcd will limit the rate.</p>
+<p>Another problem that needs to be solved is the k8s event.</p>
+<p>“EventRateLimit” is a new alpha admission controller in Kubernetes 1.13.it can mitigate the problem where the API server gets flooded by event requests.</p>
+<p>in etcd QoS Feature, The rate limit will take effect when PercentOfStorageQuotaUsed is greater than a higher threshold. If necessary,we can even refuse to write events when the number of events is greater than the threshold.</p>
+<p>These will be a complement to P&amp;R capabilities.</p>
+<p>P&amp;R is only for k8s apiserver, clients in other scenarios (such as configuration center, service discovery and scheduler services) also have the slowquery problem. In kubernetes,In order to avoid list resources, each component has done a lot of optimization and speed limit,but other clients do not have it, so slow queries are very common.</p>
+<h2 id="qos-based-on-grpc-proxy">QoS based on gRPC Proxy</h2>
+<p>Some companies, such as Alibaba, implement the etcd QoS Feature at the etcd proxy layer, it is not in the server. The advantage is that it is easy to develop and maintain and it allows experimentation without changing the etcd server binary. The disadvantage is that one more component is introduced, and the availability of etcd may decrease.</p>
+<p>Most users do not use proxy, and at the same time, we cannot estimate the cost of a query request in proxy and don&rsquo;t know the percentage of db size used, etc, which will lead to poor QoS rule expansion.</p>
+<h2 id="qos-based-on-etcd">QoS based on etcd</h2>
+<p>Next, I will introduce a solution based on etcd to implement QoS, which has the feature of flexibility and strong scalability.</p>
+<p>This Feature will be introduced behind an experimental flag. If you do not enable the experimental flag, etcd QoS API is not available and will not create related buckets for QoS in boltdb.</p>
+<p>In order to ensure its accuracy, we will implement unit testing, e2e testing, integration testing, and the most important thing is the accuracy of the speed limit. We can implement a mini-benchmark, run multiple test cases, and obtain the mean, standard deviation, and variance. Then judge whether the QPS is accurate and the error is within the allowable range based on variance.</p>
 <h1 id="proposal">Proposal</h1>
 <h2 id="identify-expensive-request">Identify Expensive Request</h2>
 <p>Expensive requests can be divided into two categories, one is cpu resource-consuming and the other is high traffic requests.</p>
@@ -493,7 +517,7 @@ If the administrator does not want to reconfigure the rules every time they add 
 <p>Limit: e.g. 10000  (“units of costs” aggregated using “aggregation method” per “Accounting group” of requests that match the “selector”)
 Metrics
 To implement metrics, report the number of requests that are speed-limited and the number of expensive requests.</p>
-<h2 id="alternative-solution">Alternative Solution</h2>
+<h2 id="alternative-solution-1">Alternative Solution</h2>
 <h2 id="faq">FAQ</h2>
 <p>1、How to  track expensive requests and make a decision on whether to limit a request?</p>
 <p>Yue9944882: Not knowing the time/cpu/memory/traffic size consumption unless the request&rsquo;s finished,kubernetes uses an &ldquo;estimated&rdquo; cost.</p>
