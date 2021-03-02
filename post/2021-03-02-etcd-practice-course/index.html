@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="redis/codis troubleshooting总结" />
-    <meta property="og:title" content="redis/codis troubleshooting总结" />
-    <meta property="twitter:title" content="redis/codis troubleshooting总结" />
+    <meta name="title" content="极客时间专栏《etcd实战课》介绍" />
+    <meta property="og:title" content="极客时间专栏《etcd实战课》介绍" />
+    <meta property="twitter:title" content="极客时间专栏《etcd实战课》介绍" />
     
 
     
-    <meta name="description" content="redis,codis,aof,replication,rdb,client,troubleshooting">
-    <meta property="og:description" content="redis,codis,aof,replication,rdb,client,troubleshooting" />
-    <meta property="twitter:description" content="redis,codis,aof,replication,rdb,client,troubleshooting" />
+    <meta name="description" content="etcd,极客时间,etcd实战课,raft,k8s,stability,performance,data inconsistency">
+    <meta property="og:description" content="etcd,极客时间,etcd实战课,raft,k8s,stability,performance,data inconsistency" />
+    <meta property="twitter:description" content="etcd,极客时间,etcd实战课,raft,k8s,stability,performance,data inconsistency" />
     
 
     
@@ -34,9 +34,9 @@
     <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, 博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>redis/codis troubleshooting总结-唐聪的博客 | TangCong Blog</title>
+    <title>极客时间专栏《etcd实战课》介绍-唐聪的博客 | TangCong Blog</title>
 
-    <link rel="canonical" href="/post/2018-04-02-redis-codis-troubleshooting/">
+    <link rel="canonical" href="/post/2021-03-02-etcd-practice-course/">
 
     <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
@@ -163,12 +163,12 @@
                 <div class="post-heading">
                     <div class="tags">
                         
-                        <a class="tag" href="/tags/redis" title="redis">
-                            redis
+                        <a class="tag" href="/tags/etcdkubernetes%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E4%B8%93%E6%A0%8Fetcd%E5%AE%9E%E6%88%98%E8%AF%BE" title="etcd,kubernetes,极客时间专栏,etcd实战课">
+                            etcd,kubernetes,极客时间专栏,etcd实战课
                         </a>
                         
                     </div>
-                    <h1>redis/codis troubleshooting总结</h1>
+                    <h1>极客时间专栏《etcd实战课》介绍</h1>
                     <h2 class="subheading"></h2>
                     <span class="meta">
                         Posted by 
@@ -176,7 +176,7 @@
                             唐聪
                          
                         on 
-                        Monday, April 2, 2018
+                        Sunday, July 5, 2020
                         
                         
                         
@@ -208,110 +208,28 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#redis主备同步失败">redis主备同步失败</a></li>
-        <li><a href="#redis-port迁移数据失败">redis-port迁移数据失败</a></li>
-        <li><a href="#redis内存碎片">redis内存碎片</a></li>
-        <li><a href="#codis-dashboard无法踢掉故障proxy">codis dashboard无法踢掉故障proxy</a></li>
-        <li><a href="#codis-proxy故障处理">codis proxy故障处理</a></li>
-        <li><a href="#codis-dashboard故障处理">codis dashboard故障处理</a></li>
-        <li><a href="#redis故障处理">redis故障处理</a></li>
-        <li><a href="#redis性能异常排查">redis性能异常排查</a></li>
-        <li><a href="#codis数据迁移">codis数据迁移</a></li>
-        <li><a href="#codis数据倾斜">codis数据倾斜</a></li>
-        <li><a href="#redis主备数据不一致">redis主备数据不一致</a></li>
+        <li><a href="#极客时间专栏etcd实战课介绍">极客时间专栏《etcd实战课》介绍</a></li>
       </ul>
     </li>
   </ul>
 </nav>
                 
-                <h2 id="redis主备同步失败">redis主备同步失败</h2>
-<p>线上某两实例重新建立主备关系时,出现如下错误</p>
-<pre><code>23203:S 02 Apr 14:27:53.148 * MASTER &lt;-&gt; SLAVE sync started
-23203:S 02 Apr 14:27:53.148 * Non blocking connect for SYNC fired the event.
-23203:S 02 Apr 14:27:53.148 * Master replied to PING, replication can continue...
-23203:S 02 Apr 14:27:53.148 * Partial resynchronization not possible (no cached master)
-23203:S 02 Apr 14:27:53.514 * Full resync from master: 6f4bf5d4394cdbb3fe9a2b7d9d5b0243595c2975:1189450456093
-23203:S 02 Apr 14:31:15.072 * MASTER &lt;-&gt; SLAVE sync: receiving 6312956914 bytes from master
-23203:S 02 Apr 14:31:36.156 # I/O error trying to sync with MASTER: connection lost
-23203:S 02 Apr 14:31:36.786 * Connecting to MASTER x.y.z.z:6379
-23203:S 02 Apr 14:31:36.786 * MASTER &lt;-&gt; SLAVE sync started
-</code></pre><p>一般出现主备同步失败原因是以下参数设置不当.</p>
-<h3 id="repl-backlog-size">repl-backlog-size</h3>
-<p>Set the replication backlog size. The backlog is a buffer that accumulates
-slave data when slaves are disconnected for some time, so that when a slave
-wants to reconnect again, often a full resync is not needed, but a partial
-resync is enough, just passing the portion of data the slave missed while
-disconnected.</p>
-<p>The bigger the replication backlog, the longer the time the slave can be
-disconnected and later be able to perform a partial resynchronization.
-The backlog is only allocated once there is at least a slave connected.</p>
-<pre><code>repl-backlog-size 1mb
-</code></pre><p>默认较小，可根据实际情况适当增大.</p>
-<h3 id="client-output-buffer-limit">client-output-buffer-limit</h3>
-<p>The client output buffer limits can be used to force disconnection of clients
-that are not reading data from the server fast enough for some reason (a
-common reason is that a Pub/Sub client can&rsquo;t consume messages as fast as the
-publisher can produce them).</p>
-<p>The limit can be set differently for the three different classes of clients:</p>
-<pre><code>normal -&gt; normal clients including MONITOR clients
-slave  -&gt; slave clients
-pubsub -&gt; clients subscribed to at least one pubsub channel or pattern
-</code></pre><p>The syntax of every client-output-buffer-limit directive is the following:</p>
-<pre><code>client-output-buffer-limit &lt;class&gt; &lt;hard limit&gt; &lt;soft limit&gt; &lt;soft seconds&gt;
-</code></pre><p>A client is immediately disconnected once the hard limit is reached, or if
-the soft limit is reached and remains reached for the specified number of
-the limit for 10 seconds.</p>
-<p>Both the hard or the soft limit can be disabled by setting them to zero.</p>
-<pre><code>client-output-buffer-limit normal 0 0 0
-client-output-buffer-limit slave 256mb 64mb 60
-client-output-buffer-limit pubsub 32mb 8mb 60
-</code></pre><p>默认较小，可根据实际情况适当增大.</p>
-<p><a href="https://github.com/CodisLabs/codis/issues/185">ISSUE</a></p>
-<h2 id="redis-port迁移数据失败">redis-port迁移数据失败</h2>
-<p><a href="https://github.com/CodisLabs/codis/issues/318">ISSUE</a></p>
-<h2 id="redis内存碎片">redis内存碎片</h2>
-<h2 id="codis-dashboard无法踢掉故障proxy">codis dashboard无法踢掉故障proxy</h2>
-<h2 id="codis-proxy故障处理">codis proxy故障处理</h2>
-<h2 id="codis-dashboard故障处理">codis dashboard故障处理</h2>
-<h2 id="redis故障处理">redis故障处理</h2>
-<h2 id="redis性能异常排查">redis性能异常排查</h2>
-<h3 id="slowlog">slowlog</h3>
-<p>hgetall等慢查询操作导致业务毛刺等.</p>
-<h3 id="bigkeys">bigkeys</h3>
-<p>大key读写访问导致毛刺</p>
-<h3 id="disk-io">disk io</h3>
-<p>主备同步或数据备份时磁盘IO上升,影响业务.</p>
-<h3 id="swap">swap</h3>
-<p>业务反馈凌晨期间成功率较低.</p>
-<h2 id="codis数据迁移">codis数据迁移</h2>
-<h2 id="codis数据倾斜">codis数据倾斜</h2>
-<h3 id="大key导致数据倾斜">大key导致数据倾斜</h3>
-<h3 id="crc32算法分布不均">crc32算法分布不均</h3>
-<h2 id="redis主备数据不一致">redis主备数据不一致</h2>
-<p>redis重新建立主备关系后，发现主备KEY数量不一致.</p>
-<p><img src="/img/redis_inconsistency.jpg" alt="redis主备key数量不一致"></p>
-<p>redis使用的lru算法是lazy随机式淘汰，而主备同步后，加载RDB文件时，会检查过期时间，过期时间小于当前时间会清除.</p>
-<pre><code>        /* Check if the key already expired. This function is used when loading
-         * an RDB file from disk, either at startup, or when an RDB was
-         * received from the master. In the latter case, the master is
-         * responsible for key expiry. If we would expire keys here, the
-         * snapshot taken by the master may not be reflected on the slave. */
-        if (server.masterhost == NULL &amp;&amp; expiretime != -1 &amp;&amp; expiretime &lt; now) {
-            decrRefCount(key);
-            decrRefCount(val);
-        } else {
-            /* Add the new object in the hash table */
-            dbAdd(db,key,val);
+                <p>​</p>
+<h2 id="极客时间专栏etcd实战课介绍">极客时间专栏《etcd实战课》介绍</h2>
+<h3 id="背景">背景</h3>
+<p>在过去几个月通过大量周末和凌晨时间的投入，与极客时间合作，推出了《etcd实战课》专栏，结合自己在这块丰富的实践经验和知识积累，希望通过近15万字、上百幅图的总结，能帮助大家快速学习etcd、掌握最佳实践。</p>
+<p>详细可阅读专栏开篇词<a href="https://time.geekbang.org/column/article/335186">为什么学习etcd</a>.</p>
+<h3 id="内容">内容</h3>
+<ul>
+<li>etcd 系统学习路径</li>
+<li>etcd 核心原理解析</li>
+<li>掌握实践中各类复杂 etcd 问题的解决方案</li>
+<li>掌握etcd在Kubernetes、服务发现、配置、分布式锁等场景的核心应用</li>
+<li>构建高可靠的 etcd 集群运维体系</li>
+</ul>
+<h3 id="专栏地址httpstimegeekbangorgcolumnintro100069901"><a href="https://time.geekbang.org/column/intro/100069901">专栏地址</a></h3>
+<p><a href="https://time.geekbang.org/column/intro/100069901">详情参考极客时间专栏</a>.</p>
 
-            /* Set the expire time if needed */
-            if (expiretime != -1) setExpire(NULL,db,key,expiretime);
-            if (lfu_freq != -1) {
-                val-&gt;lru = (LFUGetTimeInMinutes()&lt;&lt;8) | lfu_freq;
-            } else {
-                /* LRU idle time loaded from RDB is in seconds. Scale
-                 * according to the LRU clock resolution this Redis
-                 * instance was compiled with (normaly 1000 ms, so the
-</code></pre>
 
                 
 
@@ -319,13 +237,13 @@ client-output-buffer-limit pubsub 32mb 8mb 60
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/" data-toggle="tooltip" data-placement="top" title="大规模codis 集群的治理与实践">&larr;
+                        <a href="/post/2020-04-24-etcd-data-inconsistency-bug-analysis/" data-toggle="tooltip" data-placement="top" title="重启etcd可能导致数据不一致BUG分析">&larr;
                             Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="/post/2019-01-12-iptables-how-to-work/" data-toggle="tooltip" data-placement="top" title="iptables how to work">Next
+                        <a href="/post/2020-07-05-etcd-stability-and-performance-optimization-practices/" data-toggle="tooltip" data-placement="top" title="万级k8s集群背后的etcd稳定性与性能优化实践">Next
                             Post &rarr;</a>
                     </li>
                     

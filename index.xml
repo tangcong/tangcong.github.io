@@ -30,6 +30,15 @@
     </item>
     
     <item>
+      <title>极客时间专栏《etcd实战课》介绍</title>
+      <link>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</link>
+      <pubDate>Sun, 05 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</guid>
+      <description>​ 极客时间专栏《etcd实战课》介绍 背景 在过去几个月通过大量周末和凌晨时间的投入，与极客时间合作，推出了《etcd实战课》专栏，结合自己在这</description>
+    </item>
+    
+    <item>
       <title>重启etcd可能导致数据不一致BUG分析</title>
       <link>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</link>
       <pubDate>Fri, 24 Apr 2020 00:00:00 +0000</pubDate>
