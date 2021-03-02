@@ -6,10 +6,19 @@
     <description>Recent content in Posts on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 19 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 02 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://tangcong.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>极客时间专栏《etcd实战课》介绍</title>
+      <link>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</link>
+      <pubDate>Tue, 02 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</guid>
+      <description>​ 极客时间专栏《etcd实战课》介绍 背景 在过去几个月通过大量周末和凌晨时间的投入，与极客时间合作，推出了《etcd实战课》专栏，结合自己在这</description>
+    </item>
     
     <item>
       <title>etcd QoS proposal</title>
@@ -27,15 +36,6 @@
       
       <guid>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</guid>
       <description>​ 万级k8s集群背后的etcd稳定性与性能优化实践 背景 本文介绍了TKE容器团队在万级k8s集群和内部其他业务场景下遇到的一系列etcd问题，</description>
-    </item>
-    
-    <item>
-      <title>极客时间专栏《etcd实战课》介绍</title>
-      <link>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</link>
-      <pubDate>Sun, 05 Jul 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</guid>
-      <description>​ 极客时间专栏《etcd实战课》介绍 背景 在过去几个月通过大量周末和凌晨时间的投入，与极客时间合作，推出了《etcd实战课》专栏，结合自己在这</description>
     </item>
     
     <item>

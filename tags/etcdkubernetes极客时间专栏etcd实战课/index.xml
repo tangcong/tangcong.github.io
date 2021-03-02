@@ -6,7 +6,7 @@
     <description>Recent content in etcd,kubernetes,极客时间专栏,etcd实战课 on TangCong Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 05 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 02 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://tangcong.github.io/tags/etcdkubernetes%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E4%B8%93%E6%A0%8Fetcd%E5%AE%9E%E6%88%98%E8%AF%BE/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>极客时间专栏《etcd实战课》介绍</title>
       <link>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</link>
-      <pubDate>Sun, 05 Jul 2020 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 02 Mar 2021 00:00:00 +0000</pubDate>
       
       <guid>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</guid>
       <description>​ 极客时间专栏《etcd实战课》介绍 背景 在过去几个月通过大量周末和凌晨时间的投入，与极客时间合作，推出了《etcd实战课》专栏，结合自己在这</description>
