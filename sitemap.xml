@@ -5,7 +5,10 @@
     <loc>https://tangcong.github.io/categories/</loc>
     <lastmod>2021-06-15T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tangcong.github.io/tags/etcdkubernetes/</loc>
+    <loc>https://tangcong.github.io/tags/etcd/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/tags/kubernetes/</loc>
     <lastmod>2021-06-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://tangcong.github.io/post/</loc>
@@ -23,19 +26,16 @@
     <loc>https://tangcong.github.io/post/2021-06-15-etcd-3.5/</loc>
     <lastmod>2021-06-15T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tangcong.github.io/tags/etcdkubernetes%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E4%B8%93%E6%A0%8Fetcd%E5%AE%9E%E6%88%98%E8%AF%BE/</loc>
+    <loc>https://tangcong.github.io/tags/etcd%E5%AE%9E%E6%88%98%E8%AF%BE/</loc>
     <lastmod>2021-03-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</loc>
     <lastmod>2021-03-02T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tangcong.github.io/tags/etcd/</loc>
-    <lastmod>2020-09-19T00:00:00+00:00</lastmod>
+    <loc>https://tangcong.github.io/tags/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E4%B8%93%E6%A0%8F/</loc>
+    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://tangcong.github.io/post/2020-09-19-etcd-qos-proposal/</loc>
-    <lastmod>2020-09-19T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://tangcong.github.io/tags/kubernetes/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</loc>
