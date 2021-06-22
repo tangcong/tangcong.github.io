@@ -1,170 +1,108 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://tangcong.github.io/categories/</loc>
-    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/tags/etcdkubernetes/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/post/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/tags/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/categories/tech/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://tangcong.github.io/post/2021-06-15-etcd-3.5/</loc>
+    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://tangcong.github.io/tags/etcdkubernetes%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4%E4%B8%93%E6%A0%8Fetcd%E5%AE%9E%E6%88%98%E8%AF%BE/</loc>
     <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tangcong.github.io/post/</loc>
-    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tangcong.github.io/tags/</loc>
-    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tangcong.github.io/</loc>
-    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tangcong.github.io/categories/tech/</loc>
-    <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2021-03-02-etcd-practice-course/</loc>
     <lastmod>2021-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/etcd/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2020-09-19-etcd-qos-proposal/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/kubernetes/</loc>
     <lastmod>2020-09-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2020-07-05-etcd-stability-and-performance-optimization-practices/</loc>
     <lastmod>2020-07-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2020-04-24-etcd-data-inconsistency-bug-analysis/</loc>
     <lastmod>2020-04-24T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2020-04-19-etcd-upgrading-bug-analysis/</loc>
     <lastmod>2020-04-19T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2020-03-02-etcd-data-incosistency-bug-analysis/</loc>
     <lastmod>2020-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2019-03-02-k8s-best-practices/</loc>
     <lastmod>2019-03-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2019-01-13-k8s-proxy-how-to-work/</loc>
     <lastmod>2019-01-13T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/iptables/</loc>
     <lastmod>2019-01-12T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2019-01-12-iptables-how-to-work/</loc>
     <lastmod>2019-01-12T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/redis/</loc>
     <lastmod>2018-04-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2018-04-02-redis-codis-troubleshooting/</loc>
     <lastmod>2018-04-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2017-11-01-the-practices-and-challenges-of-large-scale-codis-system/</loc>
     <lastmod>2017-11-01T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/lru/</loc>
     <lastmod>2017-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2017-05-10-dive-into-the-lru-algorithm/</loc>
     <lastmod>2017-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/tags/zookeeper/</loc>
     <lastmod>2016-11-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2016-11-08-dive-into-zookeeper-principle/</loc>
     <lastmod>2016-11-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2016-10-07-dive-into-zookeeper-practices/</loc>
     <lastmod>2016-10-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2016-09-18-dive-into-zookeeper-implementation/</loc>
     <lastmod>2016-09-18T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/2016/09/11/hello-world/</loc>
     <lastmod>2016-09-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/post/2016-09-11-the-practices-and-challenges-of-large-scale-ranking-system/</loc>
     <lastmod>2016-09-11T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/search/placeholder/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/top/about/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/top/books/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/search/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://tangcong.github.io/top/</loc>
   </url>
-  
 </urlset>

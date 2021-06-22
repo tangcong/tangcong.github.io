@@ -402,11 +402,11 @@ type Condition struct {
 <p>● condition/PercentOfStorageQuotaUsed</p>
 <p>Support to match inbound requests when PercentOfStorageQuotaUsed(backendDBInUse / backendDBQuota) is greater than the threshold.</p>
 <p>● condition/traffic（implement later）</p>
-<p>Support to  match high traffic requests  when rpc requests traffic(request,response,sum of request and response) is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>Support to  match high traffic requests  when rpc requests traffic(request,response,sum of request and response) is greater than the threshold.we can track expensive requests' overheads by caching their hashes or estimating based statistical data.</p>
 <p>● Condition/numberOfScanKey</p>
-<p>Support to match slow query read requests when the number of keys scan is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>Support to match slow query read requests when the number of keys scan is greater than the threshold.we can track expensive requests' overheads by caching their hashes or estimating based statistical data.</p>
 <p>● Condition/latency（implement later）</p>
-<p>Support to match high latency requests when rpc latency is greater than the threshold.we can track expensive requests&rsquo; overheads by caching their hashes or estimating based statistical data.</p>
+<p>Support to match high latency requests when rpc latency is greater than the threshold.we can track expensive requests' overheads by caching their hashes or estimating based statistical data.</p>
 <p>For example one，if we want to limit TXN(RequestOp_RequestPut) requests to less than 2(qps)
 when &lsquo;percentOfStorageQuotaUsed &gt; 90% and prefix key is registry/events, it can describe as follows:</p>
 <pre><code>// create queue class for event
@@ -618,6 +618,8 @@ etcdctl qos rule add rule-slowlog
                         <a href="/tags/etcd" title="etcd">
                             etcd
                         </a>
+                        
+                        
                         
                         
                         

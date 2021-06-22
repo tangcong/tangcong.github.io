@@ -272,17 +272,17 @@ ZKDatabase
     data,acl,stat,children
 
 class Stat {
-    long czxid;      // created zxid
-    long mzxid;      // last modified zxid
-    long ctime;      // created
-    long mtime;      // last modified
-    int version;     // version
-    int cversion;    // child version
-    int aversion;    // acl version
-    long ephemeralOwner; // owner id if ephemeral, 0 otw
-    int dataLength;  //length of the data in the node
-    int numChildren; //number of children of this node
-    long pzxid;      // last modified children
+	long czxid;      // created zxid
+	long mzxid;      // last modified zxid
+	long ctime;      // created
+	long mtime;      // last modified
+	int version;     // version
+	int cversion;    // child version
+	int aversion;    // acl version
+	long ephemeralOwner; // owner id if ephemeral, 0 otw
+	int dataLength;  //length of the data in the node
+	int numChildren; //number of children of this node
+	long pzxid;      // last modified children
 }
 </code></pre>
 <p><a href="https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/">ConcurrentHashMap</a>是线程安全的hash table,采用了锁分段技术来减少锁竞争,以提高性能。其结构如下图所示，由两部分组成,Segment和HashEntry,锁的粒度是Segment,每个Segment 对象包含整个散列映射表的若干个桶,散列冲突时通过链表来解决.</p>
@@ -301,8 +301,8 @@ class Stat {
 这些都可以通过在zookeeper的zoo.cfg配置文件中指定，dataDir指定snapshot路径,dataLogDir指定事物日志路径，事物日志对zk吞吐量、延时有着非常大的延时，建议datadir与dataLogDir使用不同的设备，避免磁盘IO资源的争夺，影响整个系统性能和稳定性。autopurge.snapRetainCount项表示保留多少个snapshot,每个snapshot快照清理间隔小时可以通过autopurge.purgeInterval来指定。</p>
 <p>snapshot的生成和log文件的写入是在SyncRequestProcessor类中实现的，事物日志类TxnLog,快照类FileSnap,事物日志会追加到TxnLog,当记录数大于1000会刷到磁盘，当写入log数大于snapCount/2+randRoll(nextInt(snapCount/2)时,会开启线程将DataTree dump到磁盘,具体实现逻辑如下:</p>
 <pre><code>if (zks.getZKDatabase().append(si)) {
-    logCount++;
-    if (logCount &gt; (snapCount / 2 + randRoll)) {
+	logCount++;
+	if (logCount &gt; (snapCount / 2 + randRoll)) {
         randRoll = r.nextInt(snapCount/2);
         // roll the log
         zks.getZKDatabase().rollLog();
@@ -322,12 +322,12 @@ class Stat {
             snapInProcess.start();
         }
         logCount = 0;
-    }
+	}
 
 }
 toFlush.add(si);
 if (toFlush.size() &gt; 1000) {
-    flush(toFlush);
+	flush(toFlush);
 }
 </code></pre>
 <p>从zookeeper持久化的基本实现可知若写请求较大会频繁生成快照，同时因为toFlush是同步刷新数据到磁盘的,所以会影响吞吐率、延时,这也是为什么txnlog建议使用性能较好的存储硬件的原因(如SSD)。</p>
@@ -409,6 +409,8 @@ if (toFlush.size() &gt; 1000) {
                         <a href="/tags/etcd" title="etcd">
                             etcd
                         </a>
+                        
+                        
                         
                         
                         
