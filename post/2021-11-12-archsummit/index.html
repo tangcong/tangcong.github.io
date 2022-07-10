@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://tangcong.github.io/img/tag-bg.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io/img/tag-bg.jpg" />
+    
+
+    
+    <meta name="title" content="腾讯⼤规模云原⽣平台稳定性实践" />
+    <meta property="og:title" content="腾讯⼤规模云原⽣平台稳定性实践" />
+    <meta property="twitter:title" content="腾讯⼤规模云原⽣平台稳定性实践" />
+    
+
+    
+    <meta name="description" content="kubernetes,k8s,etcd,cloud native">
+    <meta property="og:description" content="kubernetes,k8s,etcd,cloud native" />
+    <meta property="twitter:description" content="kubernetes,k8s,etcd,cloud native" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, etcd实战课，etcd书籍，etcd专栏，极客时间，博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>腾讯⼤规模云原⽣平台稳定性实践-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/post/2021-11-12-archsummit/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/tag-bg.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        <a class="tag" href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                    </div>
+                    <h1>腾讯⼤规模云原⽣平台稳定性实践</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪
+                         
+                        on 
+                        Friday, November 12, 2021
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#腾讯规模云原平台稳定性实践">腾讯⼤规模云原⽣平台稳定性实践</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <p>​</p>
+<h2 id="腾讯规模云原平台稳定性实践">腾讯⼤规模云原⽣平台稳定性实践</h2>
+<p>随着云原生技术的逐步推广，越来越多业务开始使用云原生容器化的方式构建自己的应用。Kubernetes 作为云原生容器调度平台成为了行业的一致选择，基于 Kubernetes 还衍生出了 Serverless、边缘计算、 Mesh 平台等一系列云原生平台解决方案。</p>
+<p>在 2021 年 ArchSummit 全球架构师峰会【深圳站】上，我发表了题为《腾讯大规模云原生平台稳定性实践》的演讲，介绍腾讯在构建大规模云原生平台过程中提升 Kubernetes 集群稳定性的实践经验。</p>
+<h3 id="kubernetes故障案例分析与最佳实践">kubernetes故障案例分析与最佳实践</h3>
+<p>首先从典型故障案例说起，为什么 Kubernetes 稳定性不可忽视呢?下图给大家列举了三个典型场景的 Kubernetes 故障:</p>
+<p>• master 核心组件组件，Kube-apiserver/etcd 组件因大量 List 等 expensive request 导致集群雪崩，这 类故障轻则无法发布，重则影响业务数据面;</p>
+<p>• 集群 addon 组件故障，如核心的 HPA 组件等。当面对突发流量时，如果 HPA 服务遭遇故障，无法及时 扩容则也会导致严重的服务可用性故障;</p>
+<p>• 业务自行开发的 operator 引起的故障。各业务在云原生过程中，会结合业务领域知识、编写 operator 来适配自己的业务场景，而 operator 核心工作机制是根据实际状态与期望状态进行比较，并采取一致性 协调动作使它们趋于一致。然而某业务 operator 依赖方变更，返回数据异常，operator 在快速进行一致 性协调过程中，删除了某类 Kubernetes 资源，导致业务异常。</p>
+<p>&hellip;</p>
+<p><a href="https://www.infoq.cn/minibook/8uzj7pvE9eiMagMezqkT">演讲文字版，可下载腾讯云技术实践精选集2021,查看腾讯⼤规模云原⽣平台稳定性实践篇第77-89页</a>.</p>
+<h3 id="演讲pdf">演讲PDF</h3>
+<p><a href="https://static001.geekbang.org/con/85/pdf/1890348645/file/%E8%85%BE%E8%AE%AF%E5%A4%A7%E8%A7%84%E6%A8%A1%E4%BA%91%E5%8E%9F%E7%94%9F%E5%B9%B3%E5%8F%B0%E7%A8%B3%E5%AE%9A%E6%80%A7%E5%AE%9E%E8%B7%B5-%E5%94%90%E8%81%AA.pdf">查看ArchSummit演讲pdf</a>.</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2021-06-15-etcd-3.5/" data-toggle="tooltip" data-placement="top" title="一篇文章带你搞懂 etcd 3.5 的核心特性">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/post/2021-12-09-kubecon/" data-toggle="tooltip" data-placement="top" title="How to Efficiently Manage Tens of Thousands of etcd Clusters?">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2022
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>

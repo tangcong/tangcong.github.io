@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <meta property="og:site_name" content="TangCong Blog">
+    <meta property="og:type" content="article">
+
+    
+    <meta property="og:image" content="https://tangcong.github.io/img/tag-bg.jpg">
+    <meta property="twitter:image" content="https://tangcong.github.io/img/tag-bg.jpg" />
+    
+
+    
+    <meta name="title" content="如何构建万级Kubernetes集群场景下的etcd监控平台？" />
+    <meta property="og:title" content="如何构建万级Kubernetes集群场景下的etcd监控平台？" />
+    <meta property="twitter:title" content="如何构建万级Kubernetes集群场景下的etcd监控平台？" />
+    
+
+    
+    <meta name="description" content="kubernetes,k8s,etcd,cloud native,monitor,prometheus">
+    <meta property="og:description" content="kubernetes,k8s,etcd,cloud native,monitor,prometheus" />
+    <meta property="twitter:description" content="kubernetes,k8s,etcd,cloud native,monitor,prometheus" />
+    
+
+    
+    <meta property="twitter:card" content="summary" />
+    
+    
+
+    <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, etcd实战课，etcd书籍，etcd专栏，极客时间，博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>如何构建万级Kubernetes集群场景下的etcd监控平台？-唐聪的博客 | TangCong Blog</title>
+
+    <link rel="canonical" href="/post/2021-03-08-etcd-monitor-solution/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+    
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    
+    
+
+    
+    
+    <script src="/js/jquery.min.js"></script>
+    
+    
+    <script src="/js/bootstrap.min.js"></script>
+    
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    
+    
+
+</head>
+
+
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">TangCong Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                        
+                        <li>
+                            <a href="/categories/tech">tech</a>
+                        </li>
+                        
+                    
+                    
+		    
+                        <li><a href="/top/books/">BOOKS</a></li>
+                    
+                        <li><a href="/top/about/">ABOUT</a></li>
+                    
+
+                    
+		    <li>
+                        <a href="/search">SEARCH <img src="/img/search.png" height="15" style="cursor: pointer;" alt="Search"></a>
+		    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header {
+        background-image: url('/img/tag-bg.jpg')
+    }
+</style>
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        <a class="tag" href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        <a class="tag" href="/tags/prometheus" title="prometheus">
+                            prometheus
+                        </a>
+                        
+                    </div>
+                    <h1>如何构建万级Kubernetes集群场景下的etcd监控平台？</h1>
+                    <h2 class="subheading"></h2>
+                    <span class="meta">
+                        Posted by 
+                        
+                            唐聪,周成
+                         
+                        on 
+                        Monday, March 8, 2021
+                        
+                        
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                post-container">
+
+                
+                <header>
+                    <h2>TOC</h2>
+                </header>
+                <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                
+                <p>​</p>
+<h2 id="背景">背景</h2>
+<p>随着 Kubernetes 成为容器编排领域的霸主，越来越多的业务大规模在生产环境使用 Kubernetes 来部署、管理服务。腾讯云TKE正是基于原生 Kubernetes，提供以容器为核心的、高度可扩展的高性能容器管理服务，自从2017年推出后，随着 Kubernetes 的火热，我们的集群规模也增长到万级，在这过程中我们的各基础组件，尤其是etcd面临了以下挑战：</p>
+<p>如何通过一套监控系统，采集万级的TKE集群的 etcd 等组件 metrics 监控数据?</p>
+<p>如何高效治理万级集群、主动发现故障及潜在隐患？</p>
+<p>如何快速感知异常，实现快速处置、乃至自愈？</p>
+<p>为了解决以上挑战，我们基于 Kubernetes 的扩展机制，实现了一套含etcd集群管理、调度、迁移、监控、备份、巡检于一体的可视化的etcd平台，本篇文章重点和你分享的是我们etcd监控平台是如何解决以上挑战的。</p>
+<p>面对大规模监控数据采集问题，我们的解决方案从TKE诞生之初的单 Prometheu 实例、到基于 Promethes-Operator 动态构建多 Prometheus 实例、添加监控 Target, 再到基于 TKE云原生 Prometheus 产品实现水平可扩展的监控系统，成功为万级 Kubernetes 集群提供稳定的 etcd 存储服务和监控能力，etcd 监控平台治理的 Kubernetes 集群数也实现了从个位数、到千级、万级的突破。目前数据规模上，单位时间内 Prometheus Target 高达数万个，单地域指标数据量 Series 千万级，面对大规模监控数据，监控数据可用性仍能保持在99.99%以上。</p>
+<p>面对复杂分布式环境中，各种可能出现的不可控人为操作失误、硬件、软件故障，我们基于 Kubernetes 扩展机制、丰富 的etcd 知识与经验积累构建了多维度、可扩展的的巡检系统，帮助我们高效治理万级集群、主动发现潜在隐患。</p>
+<p>面对监控数据庞大，告警泛滥，我们基于高可用的监控数据，结合运营场景，建立标准化的数据运营体系，大幅减少无效告警，提高告警准确性，并进一步引入多维度的SLO，收敛告警指标，为业务方提供直观的服务水平指标。通过标准化的数据运营体系、告警分类、告警跟进、上升机制、简单场景的自愈策略等，实现故障快速处置、乃至自愈。</p>
+<p>下面，我们就和你详细介绍下，我们是如何解决以上三个挑战，希望其中的最佳实践能帮助你快速构建可扩展的业务监控系统。</p>
+<h3 id="如何构建高可用可扩展的监控数据采集服务">如何构建高可用，可扩展的监控数据采集服务？</h3>
+<p>首先是第一个问题，如何通过一套监控系统，采集万级的TKE集群的etcd组件 metrics 监控数据？</p>
+<p>大家都知道，etcd是一个开源的分布式 key-value 存储系统，它是 Kubernetes 的元数据存储，etcd的不稳定会直接导致上层服务不可用，因此etcd的监控至关重要。</p>
+<p>2017年，TKE诞生之初，集群少，因此一个单 Prometheu 实例就可以搞定监控问题了。</p>
+<p>2018年，Kubernetes 越来越被大家认可，我们的 TKE 集群数也越来越多，因此我们引入了 Promtheus-Operator 来实现动态管理 Prometheus 实例、通过多 Prometheus 实例，我们基本扛住了数千的 Kubernetes 集群监控需求，下面是其架构图。</p>
+<p>&hellip;..</p>
+<h3 id="详情">详情</h3>
+<p><a href="https://mp.weixin.qq.com/s/MonWEpHpA3EJdLeMYtJwsw">详情查看腾讯云原生公众号文章</a>.</p>
+
+
+                
+
+                <hr>
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/post/2021-03-02-etcd-practice-course/" data-toggle="tooltip" data-placement="top" title="我的极客时间专栏《etcd实战课》介绍">&larr;
+                            Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/post/2021-06-02-statefulset-on-k8s/" data-toggle="tooltip" data-placement="top" title="揭秘有状态服务上Kubernetes的核心技术">Next
+                            Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-11 col-lg-offset-1
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/etcd" title="etcd">
+                            etcd
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/kubernetes" title="kubernetes">
+                            kubernetes
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/redis" title="redis">
+                            redis
+                        </a>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <a href="/tags/zookeeper" title="zookeeper">
+                            zookeeper
+                        </a>
+                        
+                        
+                        
+                        
+                    </div>
+                </section>
+                
+
+                
+                
+                <section>
+                    <hr>
+                    <h5>FRIENDS</h5>
+                    <ul class="list-inline">
+                        
+                    </ul>
+                </section>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                    
+                    <li>
+                        <a href="mailto:tangcong506@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/tangcong">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+            
+            
+            
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; TangCong Blog 2022
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+
+
+
+</body>
+</html>
