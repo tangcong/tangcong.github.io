@@ -38,13 +38,16 @@
     <loc>https://tangcong.github.io/post/2021-12-09-kubecon/</loc>
     <lastmod>2021-12-09T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://tangcong.github.io/post/2021-12-09-kstone/</loc>
+    <lastmod>2021-12-09T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://tangcong.github.io/post/2021-11-12-archsummit/</loc>
     <lastmod>2021-11-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tangcong.github.io/post/2021-06-15-etcd-3.5/</loc>
-    <lastmod>2021-06-15T00:00:00+00:00</lastmod>
+    <loc>https://tangcong.github.io/post/2021-09-26-etcd-service-discovery/</loc>
+    <lastmod>2021-09-26T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://tangcong.github.io/post/2021-12-09-kstone/</loc>
+    <loc>https://tangcong.github.io/post/2021-06-15-etcd-3.5/</loc>
     <lastmod>2021-06-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://tangcong.github.io/tags/statefulset/</loc>

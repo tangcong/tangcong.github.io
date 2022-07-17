@@ -15,15 +15,15 @@
     
 
     
-    <meta name="title" content="一篇文章带你搞懂 etcd 3.5 的核心特性" />
-    <meta property="og:title" content="一篇文章带你搞懂 etcd 3.5 的核心特性" />
-    <meta property="twitter:title" content="一篇文章带你搞懂 etcd 3.5 的核心特性" />
+    <meta name="title" content="斗鱼直播云原生实践之注册中心篇" />
+    <meta property="og:title" content="斗鱼直播云原生实践之注册中心篇" />
+    <meta property="twitter:title" content="斗鱼直播云原生实践之注册中心篇" />
     
 
     
-    <meta name="description" content="etcd,极客时间,etcd实战课,etcd 3.5">
-    <meta property="og:description" content="etcd,极客时间,etcd实战课,etcd 3.5" />
-    <meta property="twitter:description" content="etcd,极客时间,etcd实战课,etcd 3.5" />
+    <meta name="description" content="etcd,k8s,service discovery">
+    <meta property="og:description" content="etcd,k8s,service discovery" />
+    <meta property="twitter:description" content="etcd,k8s,service discovery" />
     
 
     
@@ -34,9 +34,9 @@
     <meta name="keyword"  content="唐聪,tangcong, TangCong, 唐聪的博客, etcd实战课，etcd书籍，etcd专栏，极客时间，博客, 个人网站, 互联网, Web, 云原生, PaaS, etcd, Kubernetes, knative, 微服务, Microservice">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>一篇文章带你搞懂 etcd 3.5 的核心特性-唐聪的博客 | TangCong Blog</title>
+    <title>斗鱼直播云原生实践之注册中心篇-唐聪的博客 | TangCong Blog</title>
 
-    <link rel="canonical" href="/post/2021-06-15-etcd-3.5/">
+    <link rel="canonical" href="/post/2021-09-26-etcd-service-discovery/">
 
     <link rel="stylesheet" href="/css/iDisqus.min.css"/>
 	
@@ -172,15 +172,15 @@
                         </a>
                         
                     </div>
-                    <h1>一篇文章带你搞懂 etcd 3.5 的核心特性</h1>
+                    <h1>斗鱼直播云原生实践之注册中心篇</h1>
                     <h2 class="subheading"></h2>
                     <span class="meta">
                         Posted by 
                         
-                            唐聪
+                            唐聪等
                          
                         on 
-                        Tuesday, June 15, 2021
+                        Sunday, September 26, 2021
                         
                         
                         
@@ -212,25 +212,30 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#一篇文章带你搞懂-etcd-35-的核心特性">一篇文章带你搞懂 etcd 3.5 的核心特性</a></li>
+        <li><a href="#业务背景和痛点">业务背景和痛点</a></li>
       </ul>
     </li>
   </ul>
 </nav>
                 
                 <p>​</p>
-<h2 id="一篇文章带你搞懂-etcd-35-的核心特性">一篇文章带你搞懂 etcd 3.5 的核心特性</h2>
-<h3 id="etcd-35发布">etcd 3.5发布</h3>
-<p>美东时间2021年6月15号18点，继 etcd 3.4 版本发布近两年之后，etcd 社区官宣发布了3.5 稳定版本，其主要贡献者来自 Google、AWS、Tencent、Red Hat、ByteDance、IBM 等公司的开发者。etcd 3.5 版本的发布，将极大提升开发者体验、更快、更稳的支撑 kubernetes。</p>
-<h3 id="etcd-35-特性分析">etcd 3.5 特性分析</h3>
-<p>那么在 etcd 3.5 版本中有哪些令人期待的特性呢？</p>
-<p>下图我从模块化/开发者体验、性能、稳定性、运维和安全、文档及 RoadMap 方面为你总结了 etcd 3.5核心要点。</p>
-<p>首先，在我看来，在etcd 3.5版本，最令开发者期待的当属对 Go Module 的版本号语义的支持，并将之前大的 etcd 模块按功能进行了拆分，实现了 etcd 的模块化等，解决了饱受社区吐槽的 “go get fail”、依赖复杂、循环依赖、强制依赖过低的 gRPC 版本等痛点，将大大提升 etcd 开发者幸福度。</p>
-<p>其次，从性能及稳定性上看，etcd 3.5 版本包含了若干对etcd读写性能优化、启动耗时优化、重要 Bug 修复、内存占用优化等特性，将显著提升集群稳定性、吞吐量、延时，将更好的支撑大规模 kubernetes 集群。</p>
-<p>最后，从运维、安全上，etcd 3.5 版本包含了 etcd 日志轮转/压缩、集群降级、etcdutl、expensive request 定位、本地 trace 及分布式 trace OpenTelemetry 等特性支持，以及一系列安全问题优化，将显著提升问题定位效率。</p>
-<p>接下来我就从以上各方面为你解读 etcd 3.5 中核心特性。</p>
+<h2 id="业务背景和痛点">业务背景和痛点</h2>
+<p>斗鱼直播作为业界领先的游戏直播平台，每天为数以亿计的互联网用户提供优质的游戏直播观看、互动和娱乐等服务。</p>
+<p>随着近年直播市场的火热，斗鱼直播平台作为业内口碑和体验俱佳的互联网公司，用户量也出现井喷式增长。海量用户给平台带来的稳定性技术挑战也越发强烈，斗鱼的老架构如下图所示，无论是业务支撑还是架构设计，均存在一定的风险和隐患。</p>
+<p>为了给用户带来更好的可用性体验，斗鱼急需解决单一数据中心的问题，将老架构从单数据中心升级到多数据中心。</p>
+<h3 id="多数据中心挑战">多数据中心挑战</h3>
+<p>在实现单活升级为多活的过程中，为了确保无故障的迁移升级，我们面临一系列挑战，比如：</p>
+<ul>
+<li>有状态服务 etcd、zookeeper 等如何多数据中心同步？</li>
+<li>应用彼此之间存在 1 个复杂的树状或网状依赖关系，应该从哪里开始迁移？</li>
+<li>按什么维度来划分目标的边界，怎么避免业务焊死在一起，造成无从下手的局面？</li>
+<li>如果迁移后出现问题，如何快速恢复，并且不牵连已迁移成功的业务？</li>
+</ul>
+<p>因单活升级到多活的过程中，涉及系统众多，本文将是斗鱼直播多活改造系列的第一篇，只聚焦于注册中心模块，因此我们先和你介绍下注册中心背后的 etcd 和 zookeeper。</p>
+<h4 id="zketcd-承担的角色">zk/etcd 承担的角色</h4>
+<p>&hellip;..</p>
 <h3 id="详情">详情</h3>
-<p><a href="https://mp.weixin.qq.com/s/mhHPyCAmdbT5wXF0vBiGzQ">详情参考腾讯云原生公众号文章</a>.</p>
+<p><a href="https://mp.weixin.qq.com/s/_q7a7ch5bhXIiL8Kk3XWrg">详情参考腾讯云原生公众号文章</a>.</p>
 
 
                 
@@ -239,13 +244,13 @@
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/post/2021-06-02-statefulset-on-k8s/" data-toggle="tooltip" data-placement="top" title="揭秘有状态服务上Kubernetes的核心技术">&larr;
+                        <a href="/post/2021-06-15-etcd-3.5/" data-toggle="tooltip" data-placement="top" title="一篇文章带你搞懂 etcd 3.5 的核心特性">&larr;
                             Previous Post</a>
                     </li>
                     
                     
                     <li class="next">
-                        <a href="/post/2021-09-26-etcd-service-discovery/" data-toggle="tooltip" data-placement="top" title="斗鱼直播云原生实践之注册中心篇">Next
+                        <a href="/post/2021-11-12-archsummit/" data-toggle="tooltip" data-placement="top" title="腾讯⼤规模云原⽣平台稳定性实践">Next
                             Post &rarr;</a>
                     </li>
                     
